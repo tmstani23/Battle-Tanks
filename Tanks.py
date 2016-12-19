@@ -11,10 +11,11 @@ checkInit = pygame.init()
 print(checkInit)
 
 #define color variables:
-bgrey = (24,51,49)
-blue = (82,112,116)
-lgrey = (163,181,166)
-maroon = (128,0,0)
+black = (25,25,25)
+dgrey = (51,51,51)
+blue = (66,139,202)
+white = (230,230,230)
+green = (128,240,119)
 
 #define font variables:
 tinyFont = pygame.font.SysFont("comicsansms", 12)
@@ -83,7 +84,7 @@ def pause():
     
     #display paused messages
     message_to_screen("Paused", blue, -100, size = "large")
-    message_to_screen("Press 'C' to continue or 'Q' to quit", maroon, -20)
+    message_to_screen("Press 'C' to continue or 'Q' to quit", green, -20)
     #update the game with the changes
     pygame.display.update()
     #while the paused variable = True
@@ -112,7 +113,7 @@ def pause():
 def score(score):
     #text variable uses smallFont function renders it with the message 
     #plus the string version of the score argument input
-    text = smallFont.render("Score: " +str(score), True, bgrey)
+    text = smallFont.render("Score: " +str(score), True, dgrey)
     gameDisplay.blit(text, [0,0])
 
 #define game intro screen function:
@@ -137,14 +138,14 @@ def gameIntro():
                     #intro = false exits the game intro loop because the while loop 
                     #is dependent on intro being true
                     intro = False
-        #fill the screen with a lgrey background
-        gameDisplay.fill(lgrey)
+        #fill the screen with a white background
+        gameDisplay.fill(white)
         message_to_screen("Welcome to Battle Tanks!", blue, -160, "medium")
-        message_to_screen("The objective of the game is to shoot and destroy", bgrey, -80, "small")
-        message_to_screen("the enemy tanks before they destroy you.", bgrey, -40, "small")
-        message_to_screen("The more enemies you kill the harder they get.", bgrey, 0, "small")
-        message_to_screen("Press 'C' to play, 'P' to pause, or 'Q' to quit.", maroon, 60, "small")
-        message_to_screen("Created by Timothy Stanislav; Indoorkin Productions", bgrey, 225, "tiny")
+        message_to_screen("The objective of the game is to shoot and destroy", dgrey, -80, "small")
+        message_to_screen("the enemy tanks before they destroy you.", dgrey, -40, "small")
+        message_to_screen("The more enemies you kill the harder they get.", dgrey, 0, "small")
+        message_to_screen("Press 'C' to play, 'P' to pause, or 'Q' to quit.", green, 60, "small")
+        message_to_screen("Created by Timothy Stanislav; Indoorkin Productions", dgrey, 225, "tiny")
 
         #update and iterate clock tick at 15 fps
         pygame.display.update()
@@ -167,7 +168,7 @@ def gameLoop():
             #display 2 messages 
             message_to_screen("You lose!", blue, y_displace = -160, size = "large")
             message_to_screen("Press 'C' to play again or 'Q' to Quit.", 
-            maroon, y_displace = -80, size = "small") 
+            green, y_displace = -80, size = "small") 
             #update the game:
             pygame.display.update()
         
@@ -218,8 +219,8 @@ def gameLoop():
        
 
         #calls our gameDisplay variable and pygame's fill function
-        #will fill the entire display lgrey
-        gameDisplay.fill(lgrey)
+        #will fill the entire display white
+        gameDisplay.fill(white)
         
        
         #updates the display with the current changes
