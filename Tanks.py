@@ -58,6 +58,13 @@ def message_to_screen(msg, color, y_displace = 0, size = "small"):
     #display the two text objects to the screen:
     gameDisplay.blit(textSurf, textRect)
 
+#define text to button function (text, color, (x,y,width,height)):
+def text_to_button(msg, color, buttonX, buttonY, buttonWidth, buttonHeight, size = "small"):
+    textSurf, textRect = text_objects(msg, color, size)
+    textRect.center = (buttonX + (buttonWidth / 2)), buttonY + (buttonHeight / 2)
+    #display the two text objects to the screen:
+    gameDisplay.blit(textSurf, textRect)
+
 #create text object function that takes in message and color:    
 def text_objects(msg, color, size):
     #If the argument input size = "tiny"
@@ -75,7 +82,6 @@ def text_objects(msg, color, size):
         textSurface = largeFont.render(msg, True, color)
     #return the variable when text_objects is called
     return textSurface, textSurface.get_rect()
-
 
 
 #define the pause function
@@ -144,8 +150,20 @@ def gameIntro():
         message_to_screen("The objective of the game is to shoot and destroy", dgrey, -80, "small")
         message_to_screen("the enemy tanks before they destroy you.", dgrey, -40, "small")
         message_to_screen("The more enemies you kill the harder they get.", dgrey, 0, "small")
-        message_to_screen("Press 'C' to play, 'P' to pause, or 'Q' to quit.", green, 60, "small")
+       # message_to_screen("Press 'C' to play, 'P' to pause, or 'Q' to quit.", green, 60, "small")
         message_to_screen("Created by Timothy Stanislav; Indoorkin Productions", dgrey, 225, "tiny")
+
+
+        #draw the buttons to screen here: (where, color (x, y, height, width))
+        pygame.draw.rect(gameDisplay, dgrey, (150, 400, 100, 50))
+        pygame.draw.rect(gameDisplay, green, (350, 400, 100, 50))
+        pygame.draw.rect(gameDisplay, blue, (550, 400, 100, 50))
+
+        #call text_to_button function to draw text onto the buttons:
+        text_to_button("Play", white, 150, 400, 100, 50)
+        text_to_button("Controls", white, 350, 400, 100, 50)
+        text_to_button("Quit", white, 550, 400, 100, 50)
+        
 
         #update and iterate clock tick at 15 fps
         pygame.display.update()
