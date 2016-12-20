@@ -16,6 +16,9 @@ dgrey = (51,51,51)
 blue = (66,139,202)
 white = (230,230,230)
 green = (128,240,119)
+l_green = (169, 245, 163)
+ld_grey = (77,77,77)
+l_blue = (136, 181, 221)
 
 #define font variables:
 tinyFont = pygame.font.SysFont("comicsansms", 12)
@@ -153,9 +156,17 @@ def gameIntro():
        # message_to_screen("Press 'C' to play, 'P' to pause, or 'Q' to quit.", green, 60, "small")
         message_to_screen("Created by Timothy Stanislav; Indoorkin Productions", dgrey, 225, "tiny")
 
-
+        #define a variable that holds the current mouse position x,y as a tuple
+        mCursor = pygame.mouse.get_pos()
+        
+        if 150 + 100 > mCursor[0] > 150 and 400 + 50 > mCursor[1] > 400:
+            #draw the buttons to screen here: (where, color (x, y, height, width))
+            pygame.draw.rect(gameDisplay, ld_grey, (150, 400, 100, 50))
+        else:
+            pygame.draw.rect(gameDisplay, dgrey, (150, 400, 100, 50))
+        
         #draw the buttons to screen here: (where, color (x, y, height, width))
-        pygame.draw.rect(gameDisplay, dgrey, (150, 400, 100, 50))
+       
         pygame.draw.rect(gameDisplay, green, (350, 400, 100, 50))
         pygame.draw.rect(gameDisplay, blue, (550, 400, 100, 50))
 
