@@ -68,6 +68,17 @@ def text_to_button(msg, color, buttonX, buttonY, buttonWidth, buttonHeight, size
     #display the two text objects to the screen:
     gameDisplay.blit(textSurf, textRect)
 
+#define button function
+def button (text, x, y, width, height, inactive_color, active_color):
+    mCursor = pygame.mouse.get_pos()
+
+    if x + width > mCursor[0] > x and y + height > mCursor[1] > y:
+        pygame.draw.rect(gameDisplay, active_color, (x, y, width, height))
+    else:
+        pygame.draw.rect(gameDisplay, inactive_color, (x, y, width, height))
+    text_to_button(text,black,x,y,width,height,)
+
+
 #create text object function that takes in message and color:    
 def text_objects(msg, color, size):
     #If the argument input size = "tiny"
@@ -159,21 +170,11 @@ def gameIntro():
         #define a variable that holds the current mouse position x,y as a tuple
         mCursor = pygame.mouse.get_pos()
         
-        if 150 + 100 > mCursor[0] > 150 and 400 + 50 > mCursor[1] > 400:
-            #draw the buttons to screen here: (where, color (x, y, height, width))
-            pygame.draw.rect(gameDisplay, ld_grey, (150, 400, 100, 50))
-        else:
-            pygame.draw.rect(gameDisplay, dgrey, (150, 400, 100, 50))
-        
-        #draw the buttons to screen here: (where, color (x, y, height, width))
-       
-        pygame.draw.rect(gameDisplay, green, (350, 400, 100, 50))
-        pygame.draw.rect(gameDisplay, blue, (550, 400, 100, 50))
 
         #call text_to_button function to draw text onto the buttons:
-        text_to_button("Play", white, 150, 400, 100, 50)
-        text_to_button("Controls", white, 350, 400, 100, 50)
-        text_to_button("Quit", white, 550, 400, 100, 50)
+        button("Play", 150, 400, 100, 50, dgrey, ld_grey)
+        button("Controls", 350, 400, 100, 50, green, l_green)
+        button("Quit", 550, 400, 100, 50, blue, l_blue)
         
 
         #update and iterate clock tick at 15 fps
