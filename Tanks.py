@@ -16,6 +16,9 @@ dgrey = (51,51,51)
 blue = (66,139,202)
 white = (230,230,230)
 green = (128,240,119)
+l_green = (169, 245, 163)
+ld_grey = (77,77,77)
+l_blue = (136, 181, 221)
 
 #define font variables:
 tinyFont = pygame.font.SysFont("comicsansms", 12)
@@ -64,6 +67,17 @@ def text_to_button(msg, color, buttonX, buttonY, buttonWidth, buttonHeight, size
     textRect.center = (buttonX + (buttonWidth / 2)), buttonY + (buttonHeight / 2)
     #display the two text objects to the screen:
     gameDisplay.blit(textSurf, textRect)
+
+#define button function
+def button (text, x, y, width, height, inactive_color, active_color):
+    mCursor = pygame.mouse.get_pos()
+
+    if x + width > mCursor[0] > x and y + height > mCursor[1] > y:
+        pygame.draw.rect(gameDisplay, active_color, (x, y, width, height))
+    else:
+        pygame.draw.rect(gameDisplay, inactive_color, (x, y, width, height))
+    text_to_button(text,black,x,y,width,height,)
+
 
 #create text object function that takes in message and color:    
 def text_objects(msg, color, size):
@@ -153,16 +167,14 @@ def gameIntro():
        # message_to_screen("Press 'C' to play, 'P' to pause, or 'Q' to quit.", green, 60, "small")
         message_to_screen("Created by Timothy Stanislav; Indoorkin Productions", dgrey, 225, "tiny")
 
-
-        #draw the buttons to screen here: (where, color (x, y, height, width))
-        pygame.draw.rect(gameDisplay, dgrey, (150, 400, 100, 50))
-        pygame.draw.rect(gameDisplay, green, (350, 400, 100, 50))
-        pygame.draw.rect(gameDisplay, blue, (550, 400, 100, 50))
+        #define a variable that holds the current mouse position x,y as a tuple
+        mCursor = pygame.mouse.get_pos()
+        
 
         #call text_to_button function to draw text onto the buttons:
-        text_to_button("Play", white, 150, 400, 100, 50)
-        text_to_button("Controls", white, 350, 400, 100, 50)
-        text_to_button("Quit", white, 550, 400, 100, 50)
+        button("Play", 150, 400, 100, 50, dgrey, ld_grey)
+        button("Controls", 350, 400, 100, 50, green, l_green)
+        button("Quit", 550, 400, 100, 50, blue, l_blue)
         
 
         #update and iterate clock tick at 15 fps
