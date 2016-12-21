@@ -68,6 +68,42 @@ def text_to_button(msg, color, buttonX, buttonY, buttonWidth, buttonHeight, size
     #display the two text objects to the screen:
     gameDisplay.blit(textSurf, textRect)
 
+def game_controls():
+    
+    gameControls = True
+    #while loop that controls events that happen in the game intro screen
+    while gameControls:
+        #for any event that happens get the event from pygame library
+        for event in pygame.event.get():
+            #if user clicks the X to close the game:
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            
+        #fill the screen with a white background
+        gameDisplay.fill(white)
+        
+        #create messages to screen showing what the controls are
+        #the third argument is y axis variance
+        message_to_screen("Controls", blue, -160, "medium")
+        message_to_screen("Fire: spacebar", dgrey, -80, "small")
+        message_to_screen("Move turret: up and down arrows", dgrey, -40, "small")
+        message_to_screen("Move tank: left and right arrows", dgrey, 0, "small")
+        message_to_screen('Pause: press "p"', dgrey, 40, "small")
+
+        #define a variable that holds the current mouse position x,y as a tuple
+        mCursor = pygame.mouse.get_pos()
+        
+        #call text_to_button function to draw text onto the buttons:
+        button("Play", 150, 400, 100, 50, dgrey, ld_grey, action = "Play")
+        button("Menu", 350, 400, 100, 50, green, l_green, action = "Menu")
+        button("Quit", 550, 400, 100, 50, blue, l_blue, action = "Quit")
+
+        #update and iterate clock tick at 15 fps
+        pygame.display.update()
+        clock.tick(fps)
+
+
 #define button function
 def button (text, x, y, width, height, inactive_color, active_color, action = None):
     #gets the mouse position as a tuple of x,y values 
@@ -81,10 +117,11 @@ def button (text, x, y, width, height, inactive_color, active_color, action = No
                 pygame.quit()
                 quit()
             if action == "Controls":
-                pass
+                game_controls()
             if action == "Play":
                 gameLoop()
-
+            if action == "Menu":
+                gameIntro()
     else:
         pygame.draw.rect(gameDisplay, inactive_color, (x, y, width, height))
     text_to_button(text,black,x,y,width,height,)
