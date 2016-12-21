@@ -10,6 +10,10 @@ import random
 checkInit = pygame.init()
 print(checkInit)
 
+#define screen width and height variables:
+display_width = 800
+display_height = 600
+
 #define color variables:
 black = (25,25,25)
 dgrey = (51,51,51)
@@ -20,15 +24,16 @@ l_green = (169, 245, 163)
 ld_grey = (77,77,77)
 l_blue = (136, 181, 221)
 
+#define variables for the tank positions:
+mainTankX = display_width * 0.9
+mainTankY = display_height * 0.7
+
 #define font variables:
 tinyFont = pygame.font.SysFont("comicsansms", 12)
 smallFont = pygame.font.SysFont("comicsansms", 25)
 medFont = pygame.font.SysFont("comicsansms", 50)
 largeFont = pygame.font.SysFont("comicsansms", 80)
 
-#define screen width and height variables:
-display_width = 800
-display_height = 600
 
 #define snake's head image:
 #sh_image = pygame.image.load("c:/Tim's Files/my dream/learning/Programming/python/Snake Game/snakehead1.png")
@@ -60,6 +65,15 @@ def message_to_screen(msg, color, y_displace = 0, size = "small"):
     textRect.center = (display_width / 2), (display_height / 2 + y_displace)
     #display the two text objects to the screen:
     gameDisplay.blit(textSurf, textRect)
+
+
+#define the tank function that draws the tank elements:
+#arguments x, y for where the tank will be placed
+def tank(x, y):
+    #convert the x,y to integers because they will be passed
+        #into the function as floats from mainTankX and mainTankY
+    #20 is the width of the circle
+    pygame.draw.circle(gameDisplay, black, (int(x), int(y)), 20)
 
 #define text to button function (text, color, (x,y,width,height)):
 def text_to_button(msg, color, buttonX, buttonY, buttonWidth, buttonHeight, size = "small"):
@@ -292,13 +306,17 @@ def gameLoop():
                 elif event.key == pygame.K_p:
                     pause()
         
-       
-
+        
+        
         #calls our gameDisplay variable and pygame's fill function
         #will fill the entire display white
         gameDisplay.fill(white)
         
-       
+        #call the tank function to draw the tank onto the screen:
+        #note: the call is after the above fill otherwise the tank
+            #would be drawn over by the background
+        tank(mainTankX, mainTankY)
+
         #updates the display with the current changes
         pygame.display.update()
         
