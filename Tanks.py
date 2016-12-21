@@ -10,6 +10,10 @@ import random
 checkInit = pygame.init()
 print(checkInit)
 
+#define screen width and height variables:
+display_width = 800
+display_height = 600
+
 #define color variables:
 black = (25,25,25)
 dgrey = (51,51,51)
@@ -20,15 +24,16 @@ l_green = (169, 245, 163)
 ld_grey = (77,77,77)
 l_blue = (136, 181, 221)
 
+#define variables for the tank positions:
+mainTankX = display_width * 0.9
+mainTankY = display_height * 0.7
+
 #define font variables:
 tinyFont = pygame.font.SysFont("comicsansms", 12)
 smallFont = pygame.font.SysFont("comicsansms", 25)
 medFont = pygame.font.SysFont("comicsansms", 50)
 largeFont = pygame.font.SysFont("comicsansms", 80)
 
-#define screen width and height variables:
-display_width = 800
-display_height = 600
 
 #define snake's head image:
 #sh_image = pygame.image.load("c:/Tim's Files/my dream/learning/Programming/python/Snake Game/snakehead1.png")
@@ -61,6 +66,15 @@ def message_to_screen(msg, color, y_displace = 0, size = "small"):
     #display the two text objects to the screen:
     gameDisplay.blit(textSurf, textRect)
 
+
+#define the tank function that draws the tank elements:
+#arguments x, y for where the tank will be placed
+def tank(x, y):
+    #convert the x,y to integers because they will be passed
+        #into the function as floats from mainTankX and mainTankY
+    #20 is the width of the circle
+    pygame.draw.circle(gameDisplay, black, (int(x), int(y)), 20)
+
 #define text to button function (text, color, (x,y,width,height)):
 def text_to_button(msg, color, buttonX, buttonY, buttonWidth, buttonHeight, size = "small"):
     textSurf, textRect = text_objects(msg, color, size)
@@ -68,12 +82,60 @@ def text_to_button(msg, color, buttonX, buttonY, buttonWidth, buttonHeight, size
     #display the two text objects to the screen:
     gameDisplay.blit(textSurf, textRect)
 
-#define button function
-def button (text, x, y, width, height, inactive_color, active_color):
-    mCursor = pygame.mouse.get_pos()
+def game_controls():
+    
+    gameControls = True
+    #while loop that controls events that happen in the game intro screen
+    while gameControls:
+        #for any event that happens get the event from pygame library
+        for event in pygame.event.get():
+            #if user clicks the X to close the game:
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            
+        #fill the screen with a white background
+        gameDisplay.fill(white)
+        
+        #create messages to screen showing what the controls are
+        #the third argument is y axis variance
+        message_to_screen("Controls", blue, -160, "medium")
+        message_to_screen("Fire: spacebar", dgrey, -80, "small")
+        message_to_screen("Move turret: up and down arrows", dgrey, -40, "small")
+        message_to_screen("Move tank: left and right arrows", dgrey, 0, "small")
+        message_to_screen('Pause: press "p"', dgrey, 40, "small")
 
+        #define a variable that holds the current mouse position x,y as a tuple
+        mCursor = pygame.mouse.get_pos()
+        
+        #call text_to_button function to draw text onto the buttons:
+        button("Play", 150, 400, 100, 50, dgrey, ld_grey, action = "Play")
+        button("Menu", 350, 400, 100, 50, green, l_green, action = "Menu")
+        button("Quit", 550, 400, 100, 50, blue, l_blue, action = "Quit")
+
+        #update and iterate clock tick at 15 fps
+        pygame.display.update()
+        clock.tick(fps)
+
+
+#define button function
+def button (text, x, y, width, height, inactive_color, active_color, action = None):
+    #gets the mouse position as a tuple of x,y values 
+    mCursor = pygame.mouse.get_pos()
+    #gets when the mouse button is pressed as a tuple where [0] is not pressed and [1] is pressed
+    mClick = pygame.mouse.get_pressed()
     if x + width > mCursor[0] > x and y + height > mCursor[1] > y:
         pygame.draw.rect(gameDisplay, active_color, (x, y, width, height))
+        if mClick[0] == 1 and action != None:
+            if action == "Quit":
+                pygame.quit()
+                quit()
+            if action == "Controls":
+                game_controls()
+            if action == "Play":
+                gameLoop()
+            if action == "Menu":
+                gameIntro()
     else:
         pygame.draw.rect(gameDisplay, inactive_color, (x, y, width, height))
     text_to_button(text,black,x,y,width,height,)
@@ -170,12 +232,10 @@ def gameIntro():
         #define a variable that holds the current mouse position x,y as a tuple
         mCursor = pygame.mouse.get_pos()
         
-
         #call text_to_button function to draw text onto the buttons:
-        button("Play", 150, 400, 100, 50, dgrey, ld_grey)
-        button("Controls", 350, 400, 100, 50, green, l_green)
-        button("Quit", 550, 400, 100, 50, blue, l_blue)
-        
+        button("Play", 150, 400, 100, 50, dgrey, ld_grey, action = "Play")
+        button("Controls", 350, 400, 100, 50, green, l_green, action = "Controls")
+        button("Quit", 550, 400, 100, 50, blue, l_blue, action = "Quit")
 
         #update and iterate clock tick at 15 fps
         pygame.display.update()
@@ -246,13 +306,17 @@ def gameLoop():
                 elif event.key == pygame.K_p:
                     pause()
         
-       
-
+        
+        
         #calls our gameDisplay variable and pygame's fill function
         #will fill the entire display white
         gameDisplay.fill(white)
         
-       
+        #call the tank function to draw the tank onto the screen:
+        #note: the call is after the above fill otherwise the tank
+            #would be drawn over by the background
+        tank(mainTankX, mainTankY)
+
         #updates the display with the current changes
         pygame.display.update()
         
