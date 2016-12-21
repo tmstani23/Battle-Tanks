@@ -69,13 +69,22 @@ def text_to_button(msg, color, buttonX, buttonY, buttonWidth, buttonHeight, size
     gameDisplay.blit(textSurf, textRect)
 
 #define button function
-def button (text, x, y, width, height, inactive_color, active_color):
+def button (text, x, y, width, height, inactive_color, active_color, action = None):
+    #gets the mouse position as a tuple of x,y values 
     mCursor = pygame.mouse.get_pos()
+    #gets when the mouse button is pressed as a tuple where [0] is not pressed and [1] is pressed
     mClick = pygame.mouse.get_pressed()
     if x + width > mCursor[0] > x and y + height > mCursor[1] > y:
         pygame.draw.rect(gameDisplay, active_color, (x, y, width, height))
-        if mClick[0] == 1:
-            print("Button Clicked!!")
+        if mClick[0] == 1 and action != None:
+            if action == "Quit":
+                pygame.quit()
+                quit()
+            if action == "Controls":
+                pass
+            if action == "Play":
+                gameLoop()
+
     else:
         pygame.draw.rect(gameDisplay, inactive_color, (x, y, width, height))
     text_to_button(text,black,x,y,width,height,)
@@ -172,12 +181,10 @@ def gameIntro():
         #define a variable that holds the current mouse position x,y as a tuple
         mCursor = pygame.mouse.get_pos()
         
-
         #call text_to_button function to draw text onto the buttons:
-        button("Play", 150, 400, 100, 50, dgrey, ld_grey)
-        button("Controls", 350, 400, 100, 50, green, l_green)
-        button("Quit", 550, 400, 100, 50, blue, l_blue)
-        
+        button("Play", 150, 400, 100, 50, dgrey, ld_grey, action = "Play")
+        button("Controls", 350, 400, 100, 50, green, l_green, action = "Controls")
+        button("Quit", 550, 400, 100, 50, blue, l_blue, action = "Quit")
 
         #update and iterate clock tick at 15 fps
         pygame.display.update()
