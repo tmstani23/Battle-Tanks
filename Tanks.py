@@ -28,6 +28,10 @@ l_blue = (136, 181, 221)
 mainTankX = display_width * 0.9
 mainTankY = display_height * 0.7
 
+#define variables for the tank size:
+tankWidth = 40
+tankHeight = 20
+
 #define font variables:
 tinyFont = pygame.font.SysFont("comicsansms", 12)
 smallFont = pygame.font.SysFont("comicsansms", 25)
@@ -72,8 +76,16 @@ def message_to_screen(msg, color, y_displace = 0, size = "small"):
 def tank(x, y):
     #convert the x,y to integers because they will be passed
         #into the function as floats from mainTankX and mainTankY
-    #20 is the width of the circle
-    pygame.draw.circle(gameDisplay, black, (int(x), int(y)), 20)
+        #and it is necessary they remain whole numbers
+    x = int(x)
+    y = int(y)
+    
+    #draw circle for the tank turret:
+    pygame.draw.circle(gameDisplay, black, (x, y), int(tankHeight/2))
+    #draw tank body:
+    pygame.draw.rect(gameDisplay, black, (x-tankHeight, y, tankWidth, tankHeight))
+    #print(x-tankHeight)
+
 
 #define text to button function (text, color, (x,y,width,height)):
 def text_to_button(msg, color, buttonX, buttonY, buttonWidth, buttonHeight, size = "small"):
@@ -124,20 +136,28 @@ def button (text, x, y, width, height, inactive_color, active_color, action = No
     mCursor = pygame.mouse.get_pos()
     #gets when the mouse button is pressed as a tuple where [0] is not pressed and [1] is pressed
     mClick = pygame.mouse.get_pressed()
+    #basically if the mouse cursor is within the button x and y boundries:
     if x + width > mCursor[0] > x and y + height > mCursor[1] > y:
+        #draw the button with active color:
         pygame.draw.rect(gameDisplay, active_color, (x, y, width, height))
+        #if mouse clicks on the X at the top right then quit:
         if mClick[0] == 1 and action != None:
             if action == "Quit":
                 pygame.quit()
                 quit()
+            #if mouse clicks on controls button go to controls menu
             if action == "Controls":
                 game_controls()
+            #go to game loop and play the game screen
             if action == "Play":
                 gameLoop()
+            #go to the menu screen when menu button is clicked
             if action == "Menu":
                 gameIntro()
     else:
+        #if mouse is not over any button display the button with inactive color
         pygame.draw.rect(gameDisplay, inactive_color, (x, y, width, height))
+    #draw the text onto the buttons
     text_to_button(text,black,x,y,width,height,)
 
 
