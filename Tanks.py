@@ -31,6 +31,8 @@ mainTankY = display_height * 0.7
 #define variables for the tank size:
 tankWidth = 40
 tankHeight = 20
+turretWidth = 5
+wheelWidth = 5
 
 #define font variables:
 tinyFont = pygame.font.SysFont("comicsansms", 12)
@@ -73,6 +75,7 @@ def message_to_screen(msg, color, y_displace = 0, size = "small"):
 
 #define the tank function that draws the tank elements:
 #arguments x, y for where the tank will be placed
+#mainTankX and mainTankY are filled in for x and y here when tank() is called at the bottom of the game loop
 def tank(x, y):
     #convert the x,y to integers because they will be passed
         #into the function as floats from mainTankX and mainTankY
@@ -84,7 +87,19 @@ def tank(x, y):
     pygame.draw.circle(gameDisplay, black, (x, y), int(tankHeight/2))
     #draw tank body:
     pygame.draw.rect(gameDisplay, black, (x-tankHeight, y, tankWidth, tankHeight))
-    #print(x-tankHeight)
+    #draw the gun (where, color, (1st point location) (2nd point location), width of line):
+    pygame.draw.line(gameDisplay, black, (x,y), (x-20, y-20), turretWidth)
+    
+    
+    #create variable for starting x position to be used to align first wheel
+    startX = int(tankWidth/2) #here it is 5
+    #Draw 9 wheels next to each other
+    for i in range(9):
+        #draw one circle for each iteration  of the loop
+        pygame.draw.circle(gameDisplay, black, (x-startX, y+tankHeight), wheelWidth)
+        #subtract 5 from startX each iteration of the loop
+        startX -= 5
+    
 
 
 #define text to button function (text, color, (x,y,width,height)):
