@@ -24,9 +24,7 @@ l_green = (169, 245, 163)
 ld_grey = (77,77,77)
 l_blue = (136, 181, 221)
 
-#define variables for the tank positions:
-mainTankX = display_width * 0.9
-mainTankY = display_height * 0.7
+
 
 #define variables for the tank size:
 tankWidth = 40
@@ -286,6 +284,12 @@ def gameLoop():
     gameExit = False
     gameOver = False
 
+    #define variables for the tank positions:
+    mainTankX = display_width * 0.9
+    mainTankY = display_height * 0.7
+    #and one for tank movement:
+    tankMove = 0
+
     while not gameExit:
         
         if gameOver == True:
@@ -331,21 +335,27 @@ def gameLoop():
             if event.type == pygame.KEYDOWN:
 
                 if event.key == pygame.K_LEFT:
-                    pass
+                    tankMove = -5
                 elif event.key == pygame.K_RIGHT:
-                    pass
+                    tankMove = 5
                 elif event.key == pygame.K_UP:
                     pass
                 elif event.key == pygame.K_DOWN:
                     pass
                 elif event.key == pygame.K_p:
                     pause()
+            else:
+                tankMove = 0
         
         
         
         #calls our gameDisplay variable and pygame's fill function
         #will fill the entire display white
         gameDisplay.fill(white)
+        
+        #set variable mainTankX equal to tank move so when tank is called
+        #it moves the amount specified in tank move in the keypress event handling
+        mainTankX += tankMove
         
         #call the tank function to draw the tank onto the screen:
         #note: the call is after the above fill otherwise the tank
