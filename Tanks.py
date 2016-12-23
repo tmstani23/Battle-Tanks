@@ -24,9 +24,7 @@ l_green = (169, 245, 163)
 ld_grey = (77,77,77)
 l_blue = (136, 181, 221)
 
-#define variables for the tank positions:
-mainTankX = display_width * 0.9
-mainTankY = display_height * 0.7
+
 
 #define variables for the tank size:
 tankWidth = 40
@@ -76,19 +74,35 @@ def message_to_screen(msg, color, y_displace = 0, size = "small"):
 #define the tank function that draws the tank elements:
 #arguments x, y for where the tank will be placed
 #mainTankX and mainTankY are filled in for x and y here when tank() is called at the bottom of the game loop
-def tank(x, y):
+def tank(x, y, turretAngle):
     #convert the x,y to integers because they will be passed
         #into the function as floats from mainTankX and mainTankY
         #and it is necessary they remain whole numbers
     x = int(x)
     y = int(y)
+
+    #positions for x and y points of the turret
+    #effectively changes line angle of turret
+    possibleTurrets = [(x-27, y-2),
+                                (x-26, y-5),
+                                (x-25, y-8), 
+                                (x-23, y-12),
+                                (x-20, y-14),
+                                (x-18, y-15),
+                                (x-15, y-17),
+                                (x-13, y-19),
+                                (x-11, y-21)
+                                ]
     
     #draw circle for the tank turret:
     pygame.draw.circle(gameDisplay, black, (x, y), int(tankHeight/2))
     #draw tank body:
     pygame.draw.rect(gameDisplay, black, (x-tankHeight, y, tankWidth, tankHeight))
-    #draw the gun (where, color, (1st point location) (2nd point location), width of line):
-    pygame.draw.line(gameDisplay, black, (x,y), (x-20, y-20), turretWidth)
+    #draw the gun (where, color, turret x,y,  end point locations, width of line)
+    #when the tank() function is called the index position is passed in and the  possible turret
+        #position at that inded position will be selected.
+    #This is important because it is responsible for drawing the turret at different angles
+    pygame.draw.line(gameDisplay, black, (x,y), possibleTurrets[turretAngle], turretWidth)
     
     
     #create variable for starting x position to be used to align first wheel
@@ -194,6 +208,13 @@ def text_objects(msg, color, size):
     #return the variable when text_objects is called
     return textSurface, textSurface.get_rect()
 
+#add a function to draw a barrier to separate the two tanks:
+def barrier():
+    #generate barrier starting from the middle and randomly between + or - 20 percent of the display width
+    barrierX = (display_width / 2) + random.randint(-.2*display_width, .2*display_width)
+    barrierY = random.randrange(display_height*.1, .6*display_height)
+    #draw the barrier to screen 50 is the width barrierY is the height:
+    pygame.draw.rect(gameDisplay, black, [barrierX, display_height - barrierY, 50, barrierY])
 
 #define the pause function
 def pause():
@@ -286,6 +307,17 @@ def gameLoop():
     gameExit = False
     gameOver = False
 
+    #define variables for the tank positions:
+    mainTankX = display_width * 0.9
+    mainTankY = display_height * 0.7
+    
+    #and one for tank movement:
+    tankMove = 0
+    
+    #define variables for the turret position and turret position change:
+    currentTurretPos = 0
+    changeTurretPos = 0
+
     while not gameExit:
         
         if gameOver == True:
@@ -329,28 +361,61 @@ def gameLoop():
             
             #if arrowkey is pressed:
             if event.type == pygame.KEYDOWN:
-
+                #move tank left or right and turret up or down when keys are pressed
                 if event.key == pygame.K_LEFT:
-                    pass
+                    tankMove = -5
                 elif event.key == pygame.K_RIGHT:
-                    pass
+                    tankMove = 5
                 elif event.key == pygame.K_UP:
-                    pass
+                    changeTurretPos = 1
                 elif event.key == pygame.K_DOWN:
-                    pass
+                    changeTurretPos = -1
                 elif event.key == pygame.K_p:
                     pause()
-        
+            #if arrow key is released:
+            elif event.type == pygame.KEYUP:
+                #if the tank is already moving in a direction when key is released set speed to zero
+                #this way one can press left first then right to start moving left then right 
+                    #without messing up the movement or stopping in place.
+                #Also allows stopping when all keys are released.
+                if event.key == pygame.K_LEFT and tankMove == -5:
+                    tankMove = 0
+                elif event.key == pygame.K_RIGHT and tankMove == 5:
+                    tankMove = 0
+                #similarly, if up or down is released stop changing the turret position
+                    #so the turret stops moving
+                elif event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                    changeTurretPos = 0
         
         
         #calls our gameDisplay variable and pygame's fill function
         #will fill the entire display white
         gameDisplay.fill(white)
         
+        #set variable mainTankX equal to tank move so when tank is called
+        #it moves the amount specified in tank move in the keypress event handling
+        mainTankX += tankMove
+        
+        #set variable currentTurretPos equal to changeTurretPos so when tank is called
+        #it moves the turret the amount specified in the keypress event handling
+        currentTurretPos += changeTurretPos
+
+        #if the current position exceeds 8 the game will crash
+            #because there are only 8 turret positions in the possibleTurrets list
+        #so this code restricts the positions to 8:
+        if currentTurretPos > 8:
+            currentTurretPos = 8
+        elif currentTurretPos < 0:
+            currentTurretPos = 0
+
+        
+        #draw the barrier to the screen:
+        barrier()
+
         #call the tank function to draw the tank onto the screen:
         #note: the call is after the above fill otherwise the tank
             #would be drawn over by the background
-        tank(mainTankX, mainTankY)
+        tank(mainTankX, mainTankY, currentTurretPos)
 
         #updates the display with the current changes
         pygame.display.update()
