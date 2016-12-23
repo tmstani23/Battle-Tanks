@@ -80,13 +80,26 @@ def tank(x, y):
         #and it is necessary they remain whole numbers
     x = int(x)
     y = int(y)
+
+    #positions for x and y points of the turret
+    #effectively changes line angle of turret
+    possibleTurrets = [(x-27, y-2),
+                                (x-26, y-5),
+                                (x-25, y-8), 
+                                (x-23, y-12),
+                                (x-20, y-14),
+                                (x-18, y-15),
+                                (x-15, y-17),
+                                (x-13, y-19),
+                                (x-11, y-21)
+                                ]
     
     #draw circle for the tank turret:
     pygame.draw.circle(gameDisplay, black, (x, y), int(tankHeight/2))
     #draw tank body:
     pygame.draw.rect(gameDisplay, black, (x-tankHeight, y, tankWidth, tankHeight))
-    #draw the gun (where, color, (1st point location) (2nd point location), width of line):
-    pygame.draw.line(gameDisplay, black, (x,y), (x-20, y-20), turretWidth)
+    #draw the gun (where, color, turret x,y,  end point locations, width of line):
+    pygame.draw.line(gameDisplay, black, (x,y), possibleTurrets[0], turretWidth)
     
     
     #create variable for starting x position to be used to align first wheel
@@ -344,8 +357,16 @@ def gameLoop():
                     pass
                 elif event.key == pygame.K_p:
                     pause()
-            else:
-                tankMove = 0
+            #if arrow key is released:
+            elif event.type == pygame.KEYUP:
+                #if the tank is already moving in a direction when key is released set speed to zero
+                #this way one can press left first then right to start moving left then right 
+                #without messing up the movement or stopping in place.
+                #Also allows stopping when all keys are released.
+                if event.key == pygame.K_LEFT and tankMove == -5:
+                    tankMove = 0
+                elif event.key == pygame.K_RIGHT and tankMove == 5:
+                    tankMove = 0
         
         
         
