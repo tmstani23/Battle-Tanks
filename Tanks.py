@@ -32,6 +32,8 @@ tankHeight = 20
 turretWidth = 5
 wheelWidth = 5
 
+
+
 #define font variables:
 tinyFont = pygame.font.SysFont("comicsansms", 12)
 smallFont = pygame.font.SysFont("comicsansms", 25)
@@ -209,12 +211,10 @@ def text_objects(msg, color, size):
     return textSurface, textSurface.get_rect()
 
 #add a function to draw a barrier to separate the two tanks:
-def barrier():
-    #generate barrier starting from the middle and randomly between + or - 20 percent of the display width
-    barrierX = (display_width / 2) + random.randint(-.2*display_width, .2*display_width)
-    barrierY = random.randrange(display_height*.1, .6*display_height)
+def barrier(barrierX, barrierY, barrier_width):
+    
     #draw the barrier to screen 50 is the width barrierY is the height:
-    pygame.draw.rect(gameDisplay, black, [barrierX, display_height - barrierY, 50, barrierY])
+    pygame.draw.rect(gameDisplay, black, [barrierX, display_height - barrierY, barrier_width, barrierY])
 
 #define the pause function
 def pause():
@@ -307,16 +307,25 @@ def gameLoop():
     gameExit = False
     gameOver = False
 
+    
+    
+
     #define variables for the tank positions:
+    
     mainTankX = display_width * 0.9
     mainTankY = display_height * 0.7
-    
-    #and one for tank movement:
     tankMove = 0
+    
     
     #define variables for the turret position and turret position change:
     currentTurretPos = 0
     changeTurretPos = 0
+
+    #create main barrier variables:
+    #generate barrier starting from the middle and randomly between + or - 20 percent of the display width
+    barrierX = (display_width / 2) + random.randint(-.2*display_width, .2*display_width)
+    barrierY = random.randrange(display_height*.1, .6*display_height)
+    barrier_width = 50
 
     while not gameExit:
         
@@ -361,6 +370,7 @@ def gameLoop():
             
             #if arrowkey is pressed:
             if event.type == pygame.KEYDOWN:
+    
                 #move tank left or right and turret up or down when keys are pressed
                 if event.key == pygame.K_LEFT:
                     tankMove = -5
@@ -392,6 +402,8 @@ def gameLoop():
         #will fill the entire display white
         gameDisplay.fill(white)
         
+        
+        
         #set variable mainTankX equal to tank move so when tank is called
         #it moves the amount specified in tank move in the keypress event handling
         mainTankX += tankMove
@@ -408,14 +420,19 @@ def gameLoop():
         elif currentTurretPos < 0:
             currentTurretPos = 0
 
-        
-        #draw the barrier to the screen:
-        barrier()
 
+        #logic for what happens when tank crashes into the barrier:
+        if mainTankX - (tankWidth/2) < barrierX + barrier_width:
+            mainTankX += 5
+        
+       
         #call the tank function to draw the tank onto the screen:
         #note: the call is after the above fill otherwise the tank
             #would be drawn over by the background
         tank(mainTankX, mainTankY, currentTurretPos)
+
+        #draw the barrier to the screen:
+        barrier(barrierX, barrierY, barrier_width)
 
         #updates the display with the current changes
         pygame.display.update()
