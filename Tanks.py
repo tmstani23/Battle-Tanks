@@ -76,7 +76,7 @@ def message_to_screen(msg, color, y_displace = 0, size = "small"):
 #define the tank function that draws the tank elements:
 #arguments x, y for where the tank will be placed
 #mainTankX and mainTankY are filled in for x and y here when tank() is called at the bottom of the game loop
-def tank(x, y, turretAngle):
+def tank(x, y, turretPos):
     #convert the x,y to integers because they will be passed
         #into the function as floats from mainTankX and mainTankY
         #and it is necessary they remain whole numbers
@@ -104,19 +104,20 @@ def tank(x, y, turretAngle):
     #when the tank() function is called the index position is passed in and the  possible turret
         #position at that inded position will be selected.
     #This is important because it is responsible for drawing the turret at different angles
-    pygame.draw.line(gameDisplay, black, (x,y), possibleTurrets[turretAngle], turretWidth)
+    pygame.draw.line(gameDisplay, black, (x,y), possibleTurrets[turretPos], turretWidth)
     
     
     #create variable for starting x position to be used to align first wheel
     startX = int(tankWidth/2) #here it is 5
-    #Draw 9 wheels next to each other
+    #Draw 9 wheels next to each other using for loop
     for i in range(9):
         #draw one circle for each iteration  of the loop
         pygame.draw.circle(gameDisplay, black, (x-startX, y+tankHeight), wheelWidth)
         #subtract 5 from startX each iteration of the loop
         startX -= 5
-    
-
+    #returns the current x,y positions of the turret from the possibleTurrets list
+    #this is used later in the gun function to know where the turret is shooting from
+    return possibleTurrets[turretPos]
 
 #define text to button function (text, color, (x,y,width,height)):
 def text_to_button(msg, color, buttonX, buttonY, buttonWidth, buttonHeight, size = "small"):
@@ -216,6 +217,13 @@ def barrier(barrierX, barrierY, barrier_width):
     #draw the barrier to screen 50 is the width barrierY is the height:
     pygame.draw.rect(gameDisplay, black, [barrierX, display_height - barrierY, barrier_width, barrierY])
 
+def fireShell(xy):
+    fire = True
+    startingShell = xy
+    print("Fire!")
+    while fire:
+        fire = False
+
 #define the pause function
 def pause():
     paused = True
@@ -307,9 +315,6 @@ def gameLoop():
     gameExit = False
     gameOver = False
 
-    
-    
-
     #define variables for the tank positions:
     
     mainTankX = display_width * 0.9
@@ -328,6 +333,16 @@ def gameLoop():
     barrier_width = 50
 
     while not gameExit:
+        
+        
+        #calls our gameDisplay variable and pygame's fill function
+        #will fill the entire display white
+        gameDisplay.fill(white)
+        
+        #call the tank function to draw the tank onto the screen:
+        #note: the call is after the above fill otherwise the tank
+            #would be drawn over by the background
+        gun = tank(mainTankX, mainTankY, currentTurretPos)
         
         if gameOver == True:
            
@@ -382,6 +397,13 @@ def gameLoop():
                     changeTurretPos = -1
                 elif event.key == pygame.K_p:
                     pause()
+                #if spacebar is pressed execute fire shell function
+                #gun is the variable that holds the tank function
+                #This draws the tank entire tank to the screen
+                # and returns the current position of the turret
+                elif event.key == pygame.K_SPACE:
+                    fireShell(gun)
+
             #if arrow key is released:
             elif event.type == pygame.KEYUP:
                 #if the tank is already moving in a direction when key is released set speed to zero
@@ -396,11 +418,6 @@ def gameLoop():
                     #so the turret stops moving
                 elif event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                     changeTurretPos = 0
-        
-        
-        #calls our gameDisplay variable and pygame's fill function
-        #will fill the entire display white
-        gameDisplay.fill(white)
         
         
         
@@ -426,10 +443,7 @@ def gameLoop():
             mainTankX += 5
         
        
-        #call the tank function to draw the tank onto the screen:
-        #note: the call is after the above fill otherwise the tank
-            #would be drawn over by the background
-        tank(mainTankX, mainTankY, currentTurretPos)
+        
 
         #draw the barrier to the screen:
         barrier(barrierX, barrierY, barrier_width)
