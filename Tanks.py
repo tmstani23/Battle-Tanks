@@ -278,13 +278,16 @@ def pause():
         #run 5 iterations of the loop
         clock.tick(5)
 
-                
 #define the score function:            
 def score(score):
     #text variable uses smallFont function renders it with the message 
     #plus the string version of the score argument input
     text = smallFont.render("Score: " +str(score), True, dgrey)
     gameDisplay.blit(text, [0,0])
+
+def power(fire_power):
+    text = smallFont.render("Power: " +str(fire_power) + "%", True, black)
+    gameDisplay.blit(text, [display_width/2, 0])
 
 #define game intro screen function:
 def gameIntro():
@@ -345,6 +348,9 @@ def gameLoop():
     mainTankY = display_height * 0.9
     tankMove = 0
     
+    fire_power = 50
+    power_change = 0
+
     #define variables for the turret position and turret position change:
     currentTurretPos = 0
     changeTurretPos = 0
@@ -422,13 +428,16 @@ def gameLoop():
                     changeTurretPos = -1
                 elif event.key == pygame.K_p:
                     pause()
-                
                 #if spacebar is pressed execute fire shell function
                 elif event.key == pygame.K_SPACE:
                     #gun is the variable that holds the tank function
                     #This draws the tank entire tank to the screen
                     #and returns the current position of the turret
                     fireShell(gun, mainTankX, mainTankY, currentTurretPos)
+                elif event.key == pygame.K_a:
+                    power_change = -1
+                elif event.key == pygame.K_d:
+                    power_change = 1
 
             #if arrow key is released:
             elif event.type == pygame.KEYUP:
@@ -444,7 +453,10 @@ def gameLoop():
                     #so the turret stops moving
                 elif event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                     changeTurretPos = 0
-        
+                #once the a or d key is released power_change resets to zero 
+                    #so the change doesn't keep going infinitely adding or subtracting power
+                if event.key == pygame.K_a or event.key == pygame.K_d:
+                    power_change = 0
         
         
         #set variable mainTankX equal to tank move so when tank is called
@@ -468,6 +480,11 @@ def gameLoop():
         if mainTankX - (tankWidth/2) < barrierX + barrier_width:
             mainTankX += 5
         
+        #firepower = firepower + power_change
+        fire_power += power_change
+        #call the function firepower which displays the power to the screen
+        power(fire_power)
+
         #draw the barrier to the screen:
         barrier(barrierX, barrierY, barrier_width)
 
