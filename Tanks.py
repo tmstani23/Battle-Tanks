@@ -70,7 +70,7 @@ def message_to_screen(msg, color, y_displace = 0, size = "small"):
 #(xy is the return from the tank function, and 
 #   currentTurretPos is the position within listofPossibleTurrets
 #       this list contains x,y coordinates for the x and y position of the turret)
-def fireShell(xy, mainTankX, mainTankY, currentTurretPos):
+def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power):
     fire = True
     #save xy into variable startingShell
         #and convert the results from xy into a list 
@@ -87,13 +87,16 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos):
                 pygame.quit()
                 quit()
         print(startingShell[0], startingShell[1])
-        #draw a black circle to the screen with a center at xy positions startingShell[0] and [1] and make it 5 pixels wide
-        pygame.draw.circle(gameDisplay, black, (startingShell[0], startingShell[1]), 5)
+        #draw a green circle to the screen with a center at xy positions startingShell[0] and [1] and make it 5 pixels wide
+        pygame.draw.circle(gameDisplay, green, (startingShell[0], startingShell[1]), 5)
         #subtract 12-currentTurretPos * 2 from startingShell[0] position each iteration of the loop
         startingShell[0] -= (12 - currentTurretPos)*2 
         #add the below calculation to the startingShell[1] position each iteration of the loop
         #this controls the behavior of the shell's y trajectory
-        startingShell[1] += int((((startingShell[0] -xy[0])*0.01)**2) - (currentTurretPos + currentTurretPos / (12 - currentTurretPos)))
+        #here the fire_power is added and divided by 50
+        #this makes the shell fire stronger or weaker depending on the value of fire_power
+        #a lower number is more power and a higher number is less
+        startingShell[1] += int((((startingShell[0] -xy[0])*0.015/(fire_power/50))**2) - (currentTurretPos + currentTurretPos / (12 - currentTurretPos)))
         #once the shell reaches off the screen:
         if startingShell[1] > display_height:
             #fire is false so the while loop ends
@@ -101,6 +104,7 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos):
 
         pygame.display.update()
         clock.tick(30)
+
 
 
 #define the tank function that draws the tank elements:
@@ -433,7 +437,7 @@ def gameLoop():
                     #gun is the variable that holds the tank function
                     #This draws the tank entire tank to the screen
                     #and returns the current position of the turret
-                    fireShell(gun, mainTankX, mainTankY, currentTurretPos)
+                    fireShell(gun, mainTankX, mainTankY, currentTurretPos, fire_power)
                 elif event.key == pygame.K_a:
                     power_change = -1
                 elif event.key == pygame.K_d:
