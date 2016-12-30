@@ -66,6 +66,40 @@ def message_to_screen(msg, color, y_displace = 0, size = "small"):
     gameDisplay.blit(textSurf, textRect)
 
 
+def explosion(hit_x, hit_y):
+    #explode is the condition on which the while loop depends to continue looping
+    explode = True
+    #exitable while loop that finds a startpoint and explosions of random color and size at impact location
+    #depending on magnitude
+    while explode:
+        for event in pygame.event.get():
+            #if the user clicks the X at the top right, quit the game
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        #startpoint takes in hit_x,y variables from outside the function
+        startPoint = hit_x, hit_y
+        #colorchoices for the explosions
+        colorChoices = [blue, l_blue, green, l_green]
+        #controls number of explosions
+        magnitude = 1
+        #while number of explosions is < 50:
+        while magnitude < 50:
+            #starting at x begin a random range of numbers from -1 * magnitude value to magnitude value
+            #this will cause the shell to start at the center x and expand outwards
+            exploding_bit_x = hit_x + random.randrange(-1 * magnitude, magnitude)
+            #same as above except at the y location
+            exploding_bit_y = hit_y + random.randrange(-1 * magnitude, magnitude)
+            #draw the explosion to the screen(where, random color from colorChoices list, (impact location x,y), random pixel radius between 1 and 5)
+            pygame.draw.circle(gameDisplay, colorChoices[random.randrange(0,4)], (exploding_bit_x, exploding_bit_y), random.randrange(1,5))
+            #add one to the magnitude value
+            magnitude += 1
+            #update the screen and tick the clock 100 times 
+            pygame.display.update()
+            clock.tick(100)
+        #exit the while loop    
+        explode = False
+
 #create function that draws the shell to the screen
 #(xy is the return from the tank function, and 
 #   currentTurretPos is the position within listofPossibleTurrets
@@ -82,7 +116,6 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power):
     #begin looping while the condition fire is true:
     while fire:
         for event in pygame.event.get():
-            #if the user clicks the X at the top right, quit the game
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
@@ -101,13 +134,15 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power):
         if startingShell[1] > display_height:
             #print x and y location of the last shell on the to leave the screen
             print("Last shell:", startingShell[0], startingShell[1])
-            #create to variables that hold 
+            #create to variables that holds
             #algorithm that uses cross multiplication to determine where 
             #shell hits on the screen and then print location
             hit_x = int((startingShell[0]*display_height)/startingShell[1])
             hit_y = int(display_height)
-
             print("Impact:", hit_x, hit_y)
+            #call function that creates an explosion at impact location
+            explosion(hit_x, hit_y)
+
             
             #fire is false so the while loop ends
             fire = False
