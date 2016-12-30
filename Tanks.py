@@ -99,6 +99,16 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power):
         startingShell[1] += int((((startingShell[0] -xy[0])*0.015/(fire_power/50))**2) - (currentTurretPos + currentTurretPos / (12 - currentTurretPos)))
         #once the shell reaches off the screen:
         if startingShell[1] > display_height:
+            #print x and y location of the last shell on the to leave the screen
+            print("Last shell:", startingShell[0], startingShell[1])
+            #create to variables that hold 
+            #algorithm that uses cross multiplication to determine where 
+            #shell hits on the screen and then print location
+            hit_x = int((startingShell[0]*display_height)/startingShell[1])
+            hit_y = int(display_height)
+
+            print("Impact:", hit_x, hit_y)
+            
             #fire is false so the while loop ends
             fire = False
 
