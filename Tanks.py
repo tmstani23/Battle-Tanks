@@ -66,7 +66,7 @@ def message_to_screen(msg, color, y_displace = 0, size = "small"):
     gameDisplay.blit(textSurf, textRect)
 
 
-def explosion(hit_x, hit_y):
+def explosion(hit_x, hit_y, size=50):
     #explode is the condition on which the while loop depends to continue looping
     explode = True
     #exitable while loop that finds a startpoint and explosions of random color and size at impact location
@@ -84,7 +84,7 @@ def explosion(hit_x, hit_y):
         #controls number of explosions
         magnitude = 1
         #while number of explosions is < 50:
-        while magnitude < 50:
+        while magnitude < size:
             #starting at x begin a random range of numbers from -1 * magnitude value to magnitude value
             #this will cause the shell to start at the center x and expand outwards
             exploding_bit_x = hit_x + random.randrange(-1 * magnitude, magnitude)
@@ -104,7 +104,7 @@ def explosion(hit_x, hit_y):
 #(xy is the return from the tank function, and 
 #   currentTurretPos is the position within listofPossibleTurrets
 #       this list contains x,y coordinates for the x and y position of the turret)
-def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power):
+def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, barrierY, barrier_width):
     fire = True
     #save xy into variable startingShell
         #and convert the results from xy into a list 
@@ -142,10 +142,29 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power):
             print("Impact:", hit_x, hit_y)
             #call function that creates an explosion at impact location
             explosion(hit_x, hit_y)
-
-            
             #fire is false so the while loop ends
             fire = False
+        
+        check_x_1 = startingShell[0] <= barrierX + barrier_width
+        check_x_2 = startingShell[0] >= barrierX
+
+        check_y_1 = startingShell[1] <= display_height
+        check_y_2 = startingShell[1] >= display_height - barrierY
+
+        if check_x_1 and check_x_2 and check_y_1 and check_y_2:
+
+            #print x and y location of the last shell on the to leave the screen
+            print("Last shell:", startingShell[0], startingShell[1])
+            #create to variables that holds
+            #the value of the shells current x and y location
+            hit_x = int(startingShell[0])
+            hit_y = int(startingShell[1])
+            print("Impact:", hit_x, hit_y)
+            #call function that creates an explosion at impact location
+            explosion(hit_x, hit_y)
+            #fire is false so the while loop ends
+            fire = False    
+            
 
         pygame.display.update()
         clock.tick(30)
@@ -414,15 +433,7 @@ def gameLoop():
         
     while not gameExit:
         
-        #calls our gameDisplay variable and pygame's fill function
-        #will fill the entire display white
-        gameDisplay.fill(white)
-        
-        
-        #call the tank function to draw the tank onto the screen:
-        #note: the call is after the above fill otherwise the tank
-            #would be drawn over by the background
-        gun = tank(mainTankX, mainTankY, currentTurretPos)
+       
         
         if gameOver == True:
            
@@ -482,7 +493,7 @@ def gameLoop():
                     #gun is the variable that holds the tank function
                     #This draws the tank entire tank to the screen
                     #and returns the current position of the turret
-                    fireShell(gun, mainTankX, mainTankY, currentTurretPos, fire_power)
+                    fireShell(gun, mainTankX, mainTankY, currentTurretPos, fire_power,barrierX, barrierY, barrier_width)
                 elif event.key == pygame.K_a:
                     power_change = -1
                 elif event.key == pygame.K_d:
@@ -528,6 +539,17 @@ def gameLoop():
         #logic for what happens when tank crashes into the barrier:
         if mainTankX - (tankWidth/2) < barrierX + barrier_width:
             mainTankX += 5
+        
+        
+        #calls our gameDisplay variable and pygame's fill function
+        #will fill the entire display white
+        gameDisplay.fill(white)
+        
+        
+        #call the tank function to draw the tank onto the screen:
+        #note: the call is after the above fill otherwise the tank
+            #would be drawn over by the background
+        gun = tank(mainTankX, mainTankY, currentTurretPos)
         
         #firepower = firepower + power_change
         fire_power += power_change
