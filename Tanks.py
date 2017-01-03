@@ -125,8 +125,11 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
         print(startingShell[0], startingShell[1])
         #draw a green circle to the screen with a center at xy positions startingShell[0] and [1] and make it 5 pixels wide
         pygame.draw.circle(gameDisplay, green, (startingShell[0], startingShell[1]), 5)
-        #subtract 12-currentTurretPos * 2 from startingShell[0] position each iteration of the loop
+        
+        #if statement that controls whether friendly tank is going to fire a shell
+        #start the beginning shell x position at startingShell[0] and move it left across the screen
         startingShell[0] -= (12 - currentTurretPos)*2 
+        
         #add the below calculation to the startingShell[1] position each iteration of the loop
         #this controls the behavior of the shell's y trajectory
         #here the fire_power is added and divided by 50
@@ -177,12 +180,57 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
         pygame.display.update()
         clock.tick(30)
 
+#create enemy fire shell function.  Same as regular fireshell with minor changes:
+def eFireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, barrierY, barrier_width):
+    fire = True
+    startingShell = list(xy)
+    print("Fire!", xy)
+    print(currentTurretPos)
+    
+    while fire:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        print(startingShell[0], startingShell[1])
+        pygame.draw.circle(gameDisplay, green, (startingShell[0], startingShell[1]), 5)
+        
+        #if statement that controls whether enemy tank is going to fire a shell
+        #start the beginning shell x position at startingShell[0] and move it right across the screen
+        startingShell[0] += (12 - currentTurretPos)*2 
+        #main shell arc algorithm:
+        startingShell[1] += int((((startingShell[0] -xy[0])*0.015/(fire_power/50))**2) - (currentTurretPos + currentTurretPos / (12 - currentTurretPos)))
+        
+        #determine if the shell hit the ground then run the code:
+        if startingShell[1] > display_height - ground_height:
+            print("Last shell:", startingShell[0], startingShell[1])
+            hit_x = int((startingShell[0]*display_height-ground_height)/startingShell[1])
+            hit_y = int(display_height-ground_height)
+            print("Impact:", hit_x, hit_y)
+            explosion(hit_x, hit_y)
+            fire = False
+        
+        check_x_1 = startingShell[0] <= barrierX + barrier_width
+        check_x_2 = startingShell[0] >= barrierX
+        check_y_1 = startingShell[1] <= display_height
+        check_y_2 = startingShell[1] >= display_height - barrierY
+
+        if check_x_1 and check_x_2 and check_y_1 and check_y_2:
+            print("Last shell:", startingShell[0], startingShell[1])
+            hit_x = int(startingShell[0])
+            hit_y = int(startingShell[1])
+            print("Impact:", hit_x, hit_y)
+            explosion(hit_x, hit_y)
+            fire = False    
+            
+        pygame.display.update()
+        clock.tick(30)
 
 
-#define the tank function that draws the tank elements:
+#define the enemy tank function that draws the tank elements:
 #arguments x, y for where the tank will be placed
-#mainTankX and mainTankY are filled in for x and y here when tank() is called at the bottom of the game loop
-def tank(x, y, turretPos):
+#mainTankX and mainTankY are filled in for x and y here when enemy_tank() is called in the gameLoop
+def enemy_tank(x, y, turretPos):
     #convert the x,y to integers because they will be passed
         #into the function as floats from mainTankX and mainTankY
         #and it is necessary they remain whole numbers
@@ -191,15 +239,15 @@ def tank(x, y, turretPos):
 
     #positions for x and y points of the turret
     #effectively changes line angle of turret
-    possibleTurrets = [(x-27, y-2),
-                                (x-26, y-5),
-                                (x-25, y-8), 
-                                (x-23, y-12),
-                                (x-20, y-14),
-                                (x-18, y-15),
-                                (x-15, y-17),
-                                (x-13, y-19),
-                                (x-11, y-21)
+    possibleTurrets = [(x+27, y-2),
+                                (x+26, y-5),
+                                (x+25, y-8), 
+                                (x+23, y-12),
+                                (x+20, y-14),
+                                (x+18, y-15),
+                                (x+15, y-17),
+                                (x+13, y-19),
+                                (x+11, y-21)
                                 ]
     
     #draw circle for the tank turret:
@@ -224,6 +272,33 @@ def tank(x, y, turretPos):
     #returns the current x,y positions of the turret from the possibleTurrets list
     #this is used later in the gun function to know where the turret is shooting from
     return possibleTurrets[turretPos]
+
+def tank(x, y, turretPos):
+    #essentially the same as enemy tank so comments will only relinquish changes
+    x = int(x)
+    y = int(y)
+    possibleTurrets = [(x-27, y-2),
+                                (x-26, y-5),
+                                (x-25, y-8), 
+                                (x-23, y-12),
+                                (x-20, y-14),
+                                (x-18, y-15),
+                                (x-15, y-17),
+                                (x-13, y-19),
+                                (x-11, y-21)
+                                ]
+    
+    pygame.draw.circle(gameDisplay, black, (x, y), int(tankHeight/2))
+    pygame.draw.rect(gameDisplay, black, (x-tankHeight, y, tankWidth, tankHeight))
+    pygame.draw.line(gameDisplay, black, (x,y), possibleTurrets[turretPos], turretWidth)
+   
+    startX = int(tankWidth/2) 
+   
+    for i in range(9):
+        pygame.draw.circle(gameDisplay, black, (x-startX, y+tankHeight), wheelWidth)
+        startX -= 5
+    return possibleTurrets[turretPos]
+
 
 #define text to button function (text, color, (x,y,width,height)):
 def text_to_button(msg, color, buttonX, buttonY, buttonWidth, buttonHeight, size = "small"):
@@ -418,12 +493,16 @@ def gameLoop():
     gameExit = False
     gameOver = False
 
-    #define variables for the tank positions:
-    
+    #define variables for the friendly tank positions:
     mainTankX = display_width * 0.9
     mainTankY = display_height * 0.9
     tankMove = 0
+
+    #define enemy tank variables:
+    enemyTankX = display_width * 0.1
+    enemyTankY = display_height * 0.9
     
+    #variables for the power of the shot and the change in power:
     fire_power = 50
     power_change = 0
 
@@ -438,23 +517,17 @@ def gameLoop():
     barrier_width = 50
 
    
-        
     while not gameExit:
         
-       
-        
         if gameOver == True:
-           
-            #display 2 messages 
+           #display 2 messages 
             message_to_screen("You lose!", blue, y_displace = -160, size = "large")
             message_to_screen("Press 'C' to play again or 'Q' to Quit.", 
             green, y_displace = -80, size = "small") 
             #update the game:
             pygame.display.update()
-        
         #while game over:
         while gameOver == True:
-            
             #get the event keydown from pygame module
             for event in pygame.event.get():
                 #if user clicks the X to close the game:
@@ -502,6 +575,7 @@ def gameLoop():
                     #This draws the tank entire tank to the screen
                     #and returns the current position of the turret
                     fireShell(gun, mainTankX, mainTankY, currentTurretPos, fire_power,barrierX, barrierY, barrier_width)
+                    eFireShell(enemy_gun, enemyTankX, enemyTankY, 8, 50,barrierX, barrierY, barrier_width)
                 elif event.key == pygame.K_a:
                     power_change = -1
                 elif event.key == pygame.K_d:
@@ -558,6 +632,11 @@ def gameLoop():
         #note: the call is after the above fill otherwise the tank
             #would be drawn over by the background
         gun = tank(mainTankX, mainTankY, currentTurretPos)
+
+        #call the function to draw the enemy tank:
+        #8 is the eight position in the possibleTurrets list
+        #this means the enemy gun won't move it will remain in last position.
+        enemy_gun = enemy_tank(enemyTankX, enemyTankY, 8) 
         
         #firepower = firepower + power_change
         fire_power += power_change
