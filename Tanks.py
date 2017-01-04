@@ -181,32 +181,80 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
         clock.tick(30)
 
 #create enemy fire shell function.  Same as regular fireshell with minor changes:
-def eFireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, barrierY, barrier_width):
+def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrierX, barrierY, barrier_width, mainTankX, mainTankY):
+    
+    currentPower = 1
+    powerFound = False
+    #this loop takes many invisible shots until it finds the player tank X location
+    #then it acquires that location and exits the loop
+    #begin looping while powerFound = False:
+    while not powerFound:
+        #add 1 to currentPower each iteration of the loop
+        currentPower += 1
+        #after 100 different tries powerFound = True and the loop exits
+        if currentPower > 100:
+            powerFound = True
+        
+        #define variables for the next loop which fires the shot 
+        fire = True
+        #converts xy into a list.  xy is the return from the tank function which is possible turrets xy positions
+        startingShell = list(xy)
+        
+        while fire:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                       
+            #if statement that controls whether enemy tank is going to fire a shell
+            #start the beginning shell x position at startingShell[0] and move it right across the screen
+            startingShell[0] += (12 - currentTurretPos)*2 
+            #main shell Y arc algorithm:
+            startingShell[1] += int((((startingShell[0] -xy[0])*0.015/(currentPower/50))**2) - (currentTurretPos + currentTurretPos / (12 - currentTurretPos)))
+            
+            #determine if the shell hit the ground then run the code:
+            if startingShell[1] > display_height - ground_height:
+                hit_x = int((startingShell[0]*display_height-ground_height)/startingShell[1])
+                hit_y = int(display_height-ground_height)
+                #if the shot was between maintankX + 15 set powerFound to true and exit the loop
+                #this way the currentPower setting is now fixed at the player tank location
+                if mainTankX + 15 > hit_x > mainTankX:
+                    print("Target Acquired")
+                    powerFound = True
+                fire = False
+            
+            check_x_1 = startingShell[0] <= barrierX + barrier_width
+            check_x_2 = startingShell[0] >= barrierX
+            check_y_1 = startingShell[1] <= display_height
+            check_y_2 = startingShell[1] >= display_height - barrierY
+
+            if check_x_1 and check_x_2 and check_y_1 and check_y_2:
+                hit_x = int(startingShell[0])
+                hit_y = int(startingShell[1])
+                fire = False    
+        
+    #repeat the fire loop again this time actually drawing the shell and explosion to the screen    
     fire = True
     startingShell = list(xy)
-    print("Fire!", xy)
-    print(currentTurretPos)
-    
+        
     while fire:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
         print(startingShell[0], startingShell[1])
+        #here the shell is drawn
         pygame.draw.circle(gameDisplay, green, (startingShell[0], startingShell[1]), 5)
         
-        #if statement that controls whether enemy tank is going to fire a shell
-        #start the beginning shell x position at startingShell[0] and move it right across the screen
         startingShell[0] += (12 - currentTurretPos)*2 
-        #main shell arc algorithm:
-        startingShell[1] += int((((startingShell[0] -xy[0])*0.015/(fire_power/50))**2) - (currentTurretPos + currentTurretPos / (12 - currentTurretPos)))
+        startingShell[1] += int((((startingShell[0] -xy[0])*0.015/(currentPower/50))**2) - (currentTurretPos + currentTurretPos / (12 - currentTurretPos)))
         
-        #determine if the shell hit the ground then run the code:
         if startingShell[1] > display_height - ground_height:
             print("Last shell:", startingShell[0], startingShell[1])
             hit_x = int((startingShell[0]*display_height-ground_height)/startingShell[1])
             hit_y = int(display_height-ground_height)
             print("Impact:", hit_x, hit_y)
+            #call the explosion
             explosion(hit_x, hit_y)
             fire = False
         
@@ -220,6 +268,7 @@ def eFireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX,
             hit_x = int(startingShell[0])
             hit_y = int(startingShell[1])
             print("Impact:", hit_x, hit_y)
+            #below the explosion is called
             explosion(hit_x, hit_y)
             fire = False    
             
@@ -575,7 +624,9 @@ def gameLoop():
                     #This draws the tank entire tank to the screen
                     #and returns the current position of the turret
                     fireShell(gun, mainTankX, mainTankY, currentTurretPos, fire_power,barrierX, barrierY, barrier_width)
-                    eFireShell(enemy_gun, enemyTankX, enemyTankY, 8, 50,barrierX, barrierY, barrier_width)
+                    #enemy_gun is the same for the enemy tank,
+                    #8 is the enemy current turret position, from the possibleTurret list, and 50 is the starting fire power
+                    eFireShell(enemy_gun, enemyTankX, enemyTankY, 8, 50, barrierX, barrierY, barrier_width, mainTankX, mainTankY)
                 elif event.key == pygame.K_a:
                     power_change = -1
                 elif event.key == pygame.K_d:
