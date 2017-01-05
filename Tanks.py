@@ -23,6 +23,8 @@ green = (128,240,119)
 l_green = (169, 245, 163)
 ld_grey = (77,77,77)
 l_blue = (136, 181, 221)
+yellow = (255, 255, 0)
+red = (255, 0, 0)
 
 #define variables for the tank size:
 tankWidth = 40
@@ -107,8 +109,9 @@ def explosion(hit_x, hit_y, size=50):
 #(xy is the return from the tank function, and 
 #   currentTurretPos is the position within listofPossibleTurrets
 #       this list contains x,y coordinates for the x and y position of the turret)
-def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, barrierY, barrier_width):
+def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, barrierY, barrier_width, enemyTankX, enemyTankY):
     fire = True
+    damage = 0
     #save xy into variable startingShell
         #and convert the results from xy into a list 
         #because they were in tuple format and couldn't be modified
@@ -120,7 +123,6 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-        print(startingShell[0], startingShell[1])
         #draw a green circle to the screen with a center at xy positions startingShell[0] and [1] and make it 5 pixels wide
         pygame.draw.circle(gameDisplay, green, (startingShell[0], startingShell[1]), 5)
         
@@ -144,6 +146,13 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
             #shell hits on the screen and then print location
             hit_x = int((startingShell[0]*display_height-ground_height)/startingShell[1])
             hit_y = int(display_height-ground_height)
+             
+            #find center of enemy tank and modify damage variable
+            #to register the hit
+            if enemyTankX + 15 > hit_x > enemyTankX - 15:
+                print("hit target!")
+                damage = 25
+            
             print("Impact:", hit_x, hit_y)
             #call function that creates an explosion at impact location
             explosion(hit_x, hit_y)
@@ -177,10 +186,12 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
             
         pygame.display.update()
         clock.tick(30)
+    return damage
 
 #create enemy fire shell function.  Same as regular fireshell with minor changes:
 def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrierX, barrierY, barrier_width, mainTankX, mainTankY):
     
+    damage = 0
     currentPower = 1
     powerFound = False
     #this loop takes many invisible shots until it finds the player tank X location
@@ -252,6 +263,13 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
             hit_x = int((startingShell[0]*display_height-ground_height)/startingShell[1])
             hit_y = int(display_height-ground_height)
             print("Impact:", hit_x, hit_y)
+            
+            #find center of player tank and modify damage variable
+            #to register the hit
+            if mainTankX + 15 > hit_x > mainTankX - 15:
+                print("hit target!")
+                damage = 25
+           
             #call the explosion
             explosion(hit_x, hit_y)
             fire = False
@@ -272,6 +290,8 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
             
         pygame.display.update()
         clock.tick(30)
+    #return the current value of damage variable when called
+    return damage
 
 
 #define the enemy tank function that draws the tank elements:
@@ -646,10 +666,16 @@ def gameLoop():
                     #gun is the variable that holds the tank function
                     #This draws the tank entire tank to the screen
                     #and returns the current position of the turret
-                    fireShell(gun, mainTankX, mainTankY, currentTurretPos, fire_power,barrierX, barrierY, barrier_width)
+                    #here damage calls fireshell then returns damage and sets it = to damage
+                    damage = fireShell(gun, mainTankX, mainTankY, currentTurretPos, fire_power,barrierX, barrierY, barrier_width, enemyTankX, enemyTankY)
+                    #subtract damage from enemy health
+                    enemyHealth -= damage
                     #enemy_gun is the same for the enemy tank,
                     #8 is the enemy current turret position, from the possibleTurret list, and 50 is the starting fire power
-                    eFireShell(enemy_gun, enemyTankX, enemyTankY, 8, 50, barrierX, barrierY, barrier_width, mainTankX, mainTankY)
+                    #here damage calls eFireshell then returns damage and sets it = to damage
+                    damage = eFireShell(enemy_gun, enemyTankX, enemyTankY, 8, 50, barrierX, barrierY, barrier_width, mainTankX, mainTankY)
+                    #subtract damage from playerHealth 
+                    playerHealth -= damage
                 elif event.key == pygame.K_a:
                     power_change = -1
                 elif event.key == pygame.K_d:
@@ -702,7 +728,8 @@ def gameLoop():
         gameDisplay.fill(white)
 
         #call function that displays the dynamic healthbar rects to screen
-        healthBars(enemyHealth, playerHealth)
+        #bugnote:if you reverse the order of the arguments here the healthbars will show up opposite sides
+        healthBars(playerHealth, enemyHealth)
         
         #call the tank function to draw the tank onto the screen:
         #note: the call is after the above fill otherwise the tank
