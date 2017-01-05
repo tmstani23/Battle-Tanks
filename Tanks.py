@@ -113,8 +113,6 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
         #and convert the results from xy into a list 
         #because they were in tuple format and couldn't be modified
     startingShell = list(xy)
-    print("Fire!", xy)
-    print(currentTurretPos)
     
     #begin looping while the condition fire is true:
     while fire:
@@ -485,9 +483,30 @@ def score(score):
     text = smallFont.render("Score: " +str(score), True, dgrey)
     gameDisplay.blit(text, [0,0])
 
+
+#function that displays text showing the power of the shot as a percent to the screen
 def power(fire_power):
     text = smallFont.render("Power: " +str(fire_power) + "%", True, black)
     gameDisplay.blit(text, [display_width/2, 0])
+
+#function for the enemy and player health bars
+def healthBars(playerHealth, enemyHealth):
+    if playerHealth > 75:
+        playerHealthColor = green
+    elif playerHealth > 50:
+        playerHealthColor = yellow
+    else:
+        playerHealthColor = red
+    
+    if enemyHealth > 75:
+        enemyHealthColor = green
+    elif enemyHealth > 50:
+        enemyHealthColor = yellow
+    else:
+        enemyHealthColor = red
+
+    pygame.draw.rect(gameDisplay, playerHealthColor, (680, 25, playerHealth, 25))
+    pygame.draw.rect(gameDisplay, enemyHealthColor, (20, 25, enemyHealth, 25))
 
 #define game intro screen function:
 def gameIntro():
@@ -542,6 +561,10 @@ def gameLoop():
     gameExit = False
     gameOver = False
 
+    #variables for player and enemy health:
+    playerHealth = 100
+    enemyHealth = 100
+    
     #define variables for the friendly tank positions:
     mainTankX = display_width * 0.9
     mainTankY = display_height * 0.9
@@ -677,7 +700,9 @@ def gameLoop():
         #calls our gameDisplay variable and pygame's fill function
         #will fill the entire display white
         gameDisplay.fill(white)
-        
+
+        #call function that displays the dynamic healthbar rects to screen
+        healthBars(enemyHealth, playerHealth)
         
         #call the tank function to draw the tank onto the screen:
         #note: the call is after the above fill otherwise the tank
