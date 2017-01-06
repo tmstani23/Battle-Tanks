@@ -221,6 +221,7 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
             #main shell Y arc algorithm:
             startingShell[1] += int((((startingShell[0] -xy[0])*0.015/(currentPower/50))**2) - (currentTurretPos + currentTurretPos / (12 - currentTurretPos)))
             
+            
             #determine if the shell hit the ground then run the code:
             if startingShell[1] > display_height - ground_height:
                 hit_x = int((startingShell[0]*display_height-ground_height)/startingShell[1])
@@ -245,7 +246,9 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
     #repeat the fire loop again this time actually drawing the shell and explosion to the screen    
     fire = True
     startingShell = list(xy)
-        
+    #variable that adds randomness to the enemy current power:
+    randomPower = random.randrange(int(currentPower*0.9), int(currentPower*1.00))
+
     while fire:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -255,8 +258,10 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
         #here the shell is drawn
         pygame.draw.circle(gameDisplay, green, (startingShell[0], startingShell[1]), 5)
         
+        
+
         startingShell[0] += (12 - currentTurretPos)*2 
-        startingShell[1] += int((((startingShell[0] -xy[0])*0.015/(currentPower/50))**2) - (currentTurretPos + currentTurretPos / (12 - currentTurretPos)))
+        startingShell[1] += int((((startingShell[0] -xy[0])*0.015/(randomPower/50))**2) - (currentTurretPos + currentTurretPos / (12 - currentTurretPos)))
         
         if startingShell[1] > display_height - ground_height:
             print("Last shell:", startingShell[0], startingShell[1])
