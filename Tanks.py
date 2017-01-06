@@ -41,11 +41,6 @@ smallFont = pygame.font.SysFont("comicsansms", 25)
 medFont = pygame.font.SysFont("comicsansms", 50)
 largeFont = pygame.font.SysFont("comicsansms", 80)
 
-#define snake's head image:
-#sh_image = pygame.image.load("c:/Tim's Files/my dream/learning/Programming/python/Snake Game/snakehead1.png")
-#define apple image:
-#apple_image = pygame.image.load("c:/Tim's Files/my dream/learning/Programming/python/Snake Game/apple2.png")
-
 #create the game surface with resolution of 800 x 600:
 gameDisplay = pygame.display.set_mode((display_width, display_height))
 #Set the game title on the top bar:
@@ -89,6 +84,7 @@ def explosion(hit_x, hit_y, size=50):
         #controls number of explosions
         magnitude = 1
         #while number of explosions is < 50:
+        
         while magnitude < size:
             #starting at x begin a random range of numbers from -1 * magnitude value to magnitude value
             #this will cause the shell to start at the center x and expand outwards
@@ -102,6 +98,7 @@ def explosion(hit_x, hit_y, size=50):
             #update the screen and tick the clock 100 times 
             pygame.display.update()
             clock.tick(100)
+        
         #exit the while loop    
         explode = False
 
@@ -191,7 +188,10 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
 #create enemy fire shell function.  Same as regular fireshell with minor changes:
 def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrierX, barrierY, barrier_width, mainTankX, mainTankY):
     
+    #damage is veriable that holds amount of damage from a hit
     damage = 0
+    #currentPower is the current power of the enemy tank
+    #one is added each iteration to test all possible powers and hone in on the currect power to hit the player tank
     currentPower = 1
     powerFound = False
     #this loop takes many invisible shots until it finds the player tank X location
@@ -265,7 +265,7 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
             print("Impact:", hit_x, hit_y)
             
             #find center of player tank and modify damage variable
-            #to register the hit
+            #to register the hit change damage to 25
             if mainTankX + 15 > hit_x > mainTankX - 15:
                 print("hit target!")
                 damage = 25
@@ -401,9 +401,9 @@ def game_controls():
         mCursor = pygame.mouse.get_pos()
         
         #call text_to_button function to draw text onto the buttons:
-        button("Play", 150, 400, 100, 50, dgrey, ld_grey, action = "Play")
-        button("Menu", 350, 400, 100, 50, green, l_green, action = "Menu")
-        button("Quit", 550, 400, 100, 50, blue, l_blue, action = "Quit")
+        button("Play", 150, 400, 150, 50, dgrey, ld_grey, action = "Play")
+        button("Menu", 350, 400, 150, 50, green, l_green, action = "Menu")
+        button("Quit", 550, 400, 150, 50, blue, l_blue, action = "Quit")
 
         #update and iterate clock tick at 15 fps
         pygame.display.update()
@@ -511,6 +511,7 @@ def power(fire_power):
 
 #function for the enemy and player health bars
 def healthBars(playerHealth, enemyHealth):
+    #if statements that modify healthcolor variables once health drops to certain ranges
     if playerHealth > 75:
         playerHealthColor = green
     elif playerHealth > 50:
@@ -524,7 +525,8 @@ def healthBars(playerHealth, enemyHealth):
         enemyHealthColor = yellow
     else:
         enemyHealthColor = red
-
+    #draw the two health bars to the screen as rectangles
+    #player healthcolor changes as the variables are modified on shell hit
     pygame.draw.rect(gameDisplay, playerHealthColor, (680, 25, playerHealth, 25))
     pygame.draw.rect(gameDisplay, enemyHealthColor, (20, 25, enemyHealth, 25))
 
@@ -563,20 +565,77 @@ def gameIntro():
         mCursor = pygame.mouse.get_pos()
         
         #call text_to_button function to draw text onto the buttons:
-        button("Play", 150, 400, 100, 50, dgrey, ld_grey, action = "Play")
-        button("Controls", 350, 400, 100, 50, green, l_green, action = "Controls")
-        button("Quit", 550, 400, 100, 50, blue, l_blue, action = "Quit")
+        button("Play", 150, 400, 150, 50, dgrey, ld_grey, action = "Play")
+        button("Controls", 350, 400, 150, 50, green, l_green, action = "Controls")
+        button("Quit", 550, 400, 150, 50, blue, l_blue, action = "Quit")
 
         #update and iterate clock tick at 15 fps
         pygame.display.update()
-        clock.tick(fps)
+        clock.tick(15)
 
         
 #Create the primary game loop
 #This loop runs while the game is being played
 #It creates the background, the screen objects and 
 #iterates the code over and over like a flip book animation
+
+#function that controls what happens while gameover screen is active:
+def gameOverScreen():
+    game_over_screen = True
+    #while loop that controls events that happen while the game is over:
+    while game_over_screen:
         
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+           
+        gameDisplay.fill(white)
+        message_to_screen("Game Over!", blue, -160, "medium")
+        message_to_screen("You have been destroyed.", dgrey, -80, "small")
+
+        #define a variable that holds the current mouse position x,y as a tuple
+        mCursor = pygame.mouse.get_pos()
+        
+        button("Play Again", 150, 400, 150, 50, dgrey, ld_grey, action = "Play")
+        button("Controls", 350, 400, 150, 50, green, l_green, action = "Controls")
+        button("Quit", 550, 400, 150, 50, blue, l_blue, action = "Quit")
+
+        pygame.display.update()
+        clock.tick(15)
+
+#Define win screen function
+def winScreen():
+    win_screen = True
+    
+    #while win screen is active:
+    while win_screen:
+       
+        for event in pygame.event.get():
+            #if user clicks the X to close the game:
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+           
+        gameDisplay.fill(white)
+        message_to_screen("You Win!", blue, -160, "medium")
+        message_to_screen("Your enemy is vanquished.", dgrey, -80, "small")
+
+        #define a variable that holds the current mouse position x,y as a tuple
+        mCursor = pygame.mouse.get_pos()
+        
+        button("Play Again", 150, 400, 150, 50, dgrey, ld_grey, action = "Play")
+        button("Controls", 350, 400, 150, 50, green, l_green, action = "Controls")
+        button("Quit", 550, 400, 150, 50, blue, l_blue, action = "Quit")
+
+        pygame.display.update()
+        clock.tick(15)
+
+        
+#Create the primary game loop
+#This loop runs while the game is being played
+#It creates the background, the screen objects and 
+#iterates the code over and over like a flip book animation
 def gameLoop():
     gameExit = False
     gameOver = False
@@ -754,6 +813,13 @@ def gameLoop():
         #updates the display with the current changes
         pygame.display.update()
         
+        #logic that dictates when the game over and you win screens are activated
+        #once player or enemy health < 1
+        if playerHealth < 1:
+            gameOverScreen()
+        elif enemyHealth < 1:
+            winScreen()
+
         #define frames per second in the argument
         #forces the while loop to run 15 times per second
         #better to modify movement variables than fps because fps 
