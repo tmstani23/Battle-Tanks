@@ -136,19 +136,28 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
         
         #determine if the shell hit the ground then run the code:
         if startingShell[1] > display_height - ground_height:
-            #print x and y location of the last shell on the to leave the screen
-            print("Last shell:", startingShell[0], startingShell[1])
             #create to variables that holds
             #algorithm that uses cross multiplication to determine where 
             #shell hits on the screen and then print location
             hit_x = int((startingShell[0]*display_height-ground_height)/startingShell[1])
             hit_y = int(display_height-ground_height)
              
+            
             #find center of enemy tank and modify damage variable
             #to register the hit
-            if enemyTankX + 15 > hit_x > enemyTankX - 15:
-                print("hit target!")
+            #Assigns different damage amounts based on how close the shot is to the tank x center
+            if enemyTankX + 10 > hit_x > enemyTankX - 10:
+                print("Critical Hit!")
                 damage = 25
+            elif enemyTankX + 15 > hit_x > enemyTankX - 15:
+                print("Hard Hit!")
+                damage = 18
+            elif enemyTankX + 25 > hit_x > enemyTankX - 25:
+                print("Medium Hit!")
+                damage = 10
+            elif enemyTankX + 35 > hit_x > enemyTankX - 35:
+                print("Light Hit!")
+                damage = 5
             
             print("Impact:", hit_x, hit_y)
             #call function that creates an explosion at impact location
@@ -231,6 +240,7 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
                 if mainTankX + 15 > hit_x > mainTankX:
                     print("Target Acquired")
                     powerFound = True
+                
                 fire = False
             
             check_x_1 = startingShell[0] <= barrierX + barrier_width
@@ -271,10 +281,19 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
             
             #find center of player tank and modify damage variable
             #to register the hit change damage to 25
-            if mainTankX + 15 > hit_x > mainTankX - 15:
-                print("hit target!")
+            if mainTankX + 10 > hit_x > mainTankX - 10:
+                print("Critical Hit!")
                 damage = 25
-           
+            elif mainTankX + 15 > hit_x > mainTankX - 15:
+                print("Hard Hit!")
+                damage = 18
+            elif mainTankX + 25 > hit_x > mainTankX - 25:
+                print("Medium Hit!")
+                damage = 10
+            elif mainTankX + 35 > hit_x > mainTankX - 35:
+                print("Light Hit!")
+                damage = 5
+
             #call the explosion
             explosion(hit_x, hit_y)
             fire = False
