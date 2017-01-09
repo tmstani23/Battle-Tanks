@@ -756,6 +756,36 @@ def gameLoop():
                     #enemy_gun is the same for the enemy tank,
                     #8 is the enemy current turret position, from the possibleTurret list, and 50 is the starting fire power
                     #here damage calls eFireshell then returns damage and sets it = to damage
+                    
+                    #enemy tank movement variables:
+                    ePossibleMovement = ["f", "r"]
+                    eMoveIndex = random.randrange(0,2)
+                    #for x in range from 0 to 10
+                    for x in range(random.randrange(0,10)):
+                        #if enemytankX position is between 30 percent of the display width on either side
+                        if display_width * 0.3 > enemyTankX > display_width * 0.03:
+                            #emoveIndex will always be 0,1 or 2 in this case f, neutral,reverse
+                            #randrange will cycle through the positions in the possibleMovement list
+                            #if ePossibleMovement is position 1
+                            if ePossibleMovement[eMoveIndex] == "f":
+                                #move enemytank forward 5 pixels
+                                enemyTankX += 5
+                            #if ePossibleMovement is position 2
+                            elif ePossibleMovement[eMoveIndex] == "r":
+                                #move back 5 pixels
+                                enemyTankX -= 5
+                            #draw enemy tank, healthbars,barrier,ground,etc to the screen: this exact code is done below with comments
+                            gameDisplay.fill(white)
+                            healthBars(playerHealth, enemyHealth)
+                            gun = tank(mainTankX, mainTankY, currentTurretPos)
+                            enemy_gun = enemy_tank(enemyTankX, enemyTankY, 8) 
+                            fire_power += power_change
+                            power(fire_power)
+                            barrier(barrierX, barrierY, barrier_width)
+                            gameDisplay.fill(green, rect = [0, display_height-ground_height, display_width, ground_height])
+                            pygame.display.update()     
+                            clock.tick(fps)
+                    
                     damage = eFireShell(enemy_gun, enemyTankX, enemyTankY, 8, 50, barrierX, barrierY, barrier_width, mainTankX, mainTankY)
                     #subtract damage from playerHealth 
                     playerHealth -= damage
