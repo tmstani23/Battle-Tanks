@@ -26,6 +26,9 @@ l_blue = (136, 181, 221)
 yellow = (255, 255, 0)
 red = (255, 0, 0)
 
+fireSound = pygame.mixer.Sound("c:/Tim's Files/my dream/learning/Programming/python/Tanks/explosion4.wav")
+explosionSound = pygame.mixer.Sound("c:/Tim's Files/my dream/learning/Programming/python/Tanks/explosion1.wav")
+
 #define variables for the tank size:
 tankWidth = 40
 tankHeight = 20
@@ -67,6 +70,8 @@ def message_to_screen(msg, color, y_displace = 0, size = "small"):
 
 
 def explosion(hit_x, hit_y, size=50):
+    #play sound for the explosion
+    pygame.mixer.Sound.play(explosionSound)
     #explode is the condition on which the while loop depends to continue looping
     explode = True
     #exitable while loop that finds a startpoint and explosions of random color and size at impact location
@@ -107,6 +112,8 @@ def explosion(hit_x, hit_y, size=50):
 #   currentTurretPos is the position within listofPossibleTurrets
 #       this list contains x,y coordinates for the x and y position of the turret)
 def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, barrierY, barrier_width, enemyTankX, enemyTankY):
+    #play sound for shell firing
+    pygame.mixer.Sound.play(fireSound)
     fire = True
     damage = 0
     #save xy into variable startingShell
@@ -196,7 +203,8 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
 
 #create enemy fire shell function.  Same as regular fireshell with minor changes:
 def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrierX, barrierY, barrier_width, mainTankX, mainTankY):
-    
+    #play shell firing sound:
+    pygame.mixer.Sound.play(fireSound)
     #damage is veriable that holds amount of damage from a hit
     damage = 0
     #currentPower is the current power of the enemy tank
