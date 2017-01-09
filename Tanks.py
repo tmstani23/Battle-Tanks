@@ -26,6 +26,9 @@ l_blue = (136, 181, 221)
 yellow = (255, 255, 0)
 red = (255, 0, 0)
 
+fireSound = pygame.mixer.Sound("c:/Tim's Files/my dream/learning/Programming/python/Tanks/explosion4.wav")
+explosionSound = pygame.mixer.Sound("c:/Tim's Files/my dream/learning/Programming/python/Tanks/explosion1.wav")
+
 #define variables for the tank size:
 tankWidth = 40
 tankHeight = 20
@@ -67,6 +70,8 @@ def message_to_screen(msg, color, y_displace = 0, size = "small"):
 
 
 def explosion(hit_x, hit_y, size=50):
+    #play sound for the explosion
+    pygame.mixer.Sound.play(explosionSound)
     #explode is the condition on which the while loop depends to continue looping
     explode = True
     #exitable while loop that finds a startpoint and explosions of random color and size at impact location
@@ -107,6 +112,8 @@ def explosion(hit_x, hit_y, size=50):
 #   currentTurretPos is the position within listofPossibleTurrets
 #       this list contains x,y coordinates for the x and y position of the turret)
 def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, barrierY, barrier_width, enemyTankX, enemyTankY):
+    #play sound for shell firing
+    pygame.mixer.Sound.play(fireSound)
     fire = True
     damage = 0
     #save xy into variable startingShell
@@ -136,19 +143,28 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
         
         #determine if the shell hit the ground then run the code:
         if startingShell[1] > display_height - ground_height:
-            #print x and y location of the last shell on the to leave the screen
-            print("Last shell:", startingShell[0], startingShell[1])
             #create to variables that holds
             #algorithm that uses cross multiplication to determine where 
             #shell hits on the screen and then print location
             hit_x = int((startingShell[0]*display_height-ground_height)/startingShell[1])
             hit_y = int(display_height-ground_height)
              
+            
             #find center of enemy tank and modify damage variable
             #to register the hit
-            if enemyTankX + 15 > hit_x > enemyTankX - 15:
-                print("hit target!")
+            #Assigns different damage amounts based on how close the shot is to the tank x center
+            if enemyTankX + 10 > hit_x > enemyTankX - 10:
+                print("Critical Hit!")
                 damage = 25
+            elif enemyTankX + 15 > hit_x > enemyTankX - 15:
+                print("Hard Hit!")
+                damage = 18
+            elif enemyTankX + 25 > hit_x > enemyTankX - 25:
+                print("Medium Hit!")
+                damage = 10
+            elif enemyTankX + 35 > hit_x > enemyTankX - 35:
+                print("Light Hit!")
+                damage = 5
             
             print("Impact:", hit_x, hit_y)
             #call function that creates an explosion at impact location
@@ -187,7 +203,8 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
 
 #create enemy fire shell function.  Same as regular fireshell with minor changes:
 def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrierX, barrierY, barrier_width, mainTankX, mainTankY):
-    
+    #play shell firing sound:
+    pygame.mixer.Sound.play(fireSound)
     #damage is veriable that holds amount of damage from a hit
     damage = 0
     #currentPower is the current power of the enemy tank
@@ -231,6 +248,7 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
                 if mainTankX + 15 > hit_x > mainTankX:
                     print("Target Acquired")
                     powerFound = True
+                
                 fire = False
             
             check_x_1 = startingShell[0] <= barrierX + barrier_width
@@ -271,10 +289,19 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
             
             #find center of player tank and modify damage variable
             #to register the hit change damage to 25
-            if mainTankX + 15 > hit_x > mainTankX - 15:
-                print("hit target!")
+            if mainTankX + 10 > hit_x > mainTankX - 10:
+                print("Critical Hit!")
                 damage = 25
-           
+            elif mainTankX + 15 > hit_x > mainTankX - 15:
+                print("Hard Hit!")
+                damage = 18
+            elif mainTankX + 25 > hit_x > mainTankX - 25:
+                print("Medium Hit!")
+                damage = 10
+            elif mainTankX + 35 > hit_x > mainTankX - 35:
+                print("Light Hit!")
+                damage = 5
+
             #call the explosion
             explosion(hit_x, hit_y)
             fire = False
@@ -737,6 +764,36 @@ def gameLoop():
                     #enemy_gun is the same for the enemy tank,
                     #8 is the enemy current turret position, from the possibleTurret list, and 50 is the starting fire power
                     #here damage calls eFireshell then returns damage and sets it = to damage
+                    
+                    #enemy tank movement variables:
+                    ePossibleMovement = ["f", "r"]
+                    eMoveIndex = random.randrange(0,2)
+                    #for x in range from 0 to 10
+                    for x in range(random.randrange(0,10)):
+                        #if enemytankX position is between 30 percent of the display width on either side
+                        if display_width * 0.3 > enemyTankX > display_width * 0.03:
+                            #emoveIndex will always be 0,1 or 2 in this case f, neutral,reverse
+                            #randrange will cycle through the positions in the possibleMovement list
+                            #if ePossibleMovement is position 1
+                            if ePossibleMovement[eMoveIndex] == "f":
+                                #move enemytank forward 5 pixels
+                                enemyTankX += 5
+                            #if ePossibleMovement is position 2
+                            elif ePossibleMovement[eMoveIndex] == "r":
+                                #move back 5 pixels
+                                enemyTankX -= 5
+                            #draw enemy tank, healthbars,barrier,ground,etc to the screen: this exact code is done below with comments
+                            gameDisplay.fill(white)
+                            healthBars(playerHealth, enemyHealth)
+                            gun = tank(mainTankX, mainTankY, currentTurretPos)
+                            enemy_gun = enemy_tank(enemyTankX, enemyTankY, 8) 
+                            fire_power += power_change
+                            power(fire_power)
+                            barrier(barrierX, barrierY, barrier_width)
+                            gameDisplay.fill(green, rect = [0, display_height-ground_height, display_width, ground_height])
+                            pygame.display.update()     
+                            clock.tick(fps)
+                    
                     damage = eFireShell(enemy_gun, enemyTankX, enemyTankY, 8, 50, barrierX, barrierY, barrier_width, mainTankX, mainTankY)
                     #subtract damage from playerHealth 
                     playerHealth -= damage
