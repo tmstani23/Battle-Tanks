@@ -424,10 +424,11 @@ def game_controls():
         #create messages to screen showing what the controls are
         #the third argument is y axis variance
         message_to_screen("Controls", blue, -160, "medium")
-        message_to_screen("Fire: spacebar", dgrey, -80, "small")
-        message_to_screen("Move turret: up and down arrows", dgrey, -40, "small")
-        message_to_screen("Move tank: left and right arrows", dgrey, 0, "small")
-        message_to_screen('Pause: press "p"', dgrey, 40, "small")
+        message_to_screen("Fire: spacebar", dgrey, -100, "small")
+        message_to_screen("Move turret: up and down arrows", dgrey, -60, "small")
+        message_to_screen("Move tank: left and right arrows", dgrey, -20, "small")
+        message_to_screen("Increase/decrease power: a/d", dgrey, 20, "small")
+        message_to_screen('Pause: press "p"', dgrey, 60, "small")
 
         #define a variable that holds the current mouse position x,y as a tuple
         mCursor = pygame.mouse.get_pos()
@@ -439,7 +440,7 @@ def game_controls():
 
         #update and iterate clock tick at 15 fps
         pygame.display.update()
-        clock.tick(fps)
+        clock.tick(30)
 
 
 #define button function
@@ -504,7 +505,7 @@ def pause():
     
     #display paused messages
     message_to_screen("Paused", blue, -100, size = "large")
-    message_to_screen("Press 'C' to continue or 'Q' to quit", green, -20)
+    message_to_screen("Press 'C' to continue, M for menu or 'Q' to quit", green, -20)
     #update the game with the changes
     pygame.display.update()
     #while the paused variable = True
@@ -520,13 +521,15 @@ def pause():
                 #if key is c paused = False so exit the loop
                 if event.key == pygame.K_c:
                     paused = False
+                elif event.key == pygame.K_m:
+                    gameIntro()
                 #else if the q key: quit the game
                 elif event.key == pygame.K_q:
                     pygame.quit()
                     quit()
       
         #run 5 iterations of the loop
-        clock.tick(5)
+        clock.tick(15)
 
 #define the score function:            
 def score(score):
@@ -601,9 +604,9 @@ def gameIntro():
         button("Controls", 350, 400, 150, 50, green, l_green, action = "Controls")
         button("Quit", 550, 400, 150, 50, blue, l_blue, action = "Quit")
 
-        #update and iterate clock tick at 15 fps
+        #update and iterate clock tick 30 times
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(30)
 
         
 #Create the primary game loop
@@ -634,7 +637,7 @@ def gameOverScreen():
         button("Quit", 550, 400, 150, 50, blue, l_blue, action = "Quit")
 
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(30)
 
 #Define win screen function
 def winScreen():
@@ -661,7 +664,7 @@ def winScreen():
         button("Quit", 550, 400, 150, 50, blue, l_blue, action = "Quit")
 
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(30)
 
         
 #Create the primary game loop
@@ -695,8 +698,8 @@ def gameLoop():
 
     #create main barrier variables:
     #generate barrier starting from the middle and randomly between + or - 20 percent of the display width
-    barrierX = (display_width / 2) + random.randint(-.2*display_width, .2*display_width)
-    barrierY = random.randrange(display_height*.1, .6*display_height)
+    barrierX = (display_width / 2) + random.randint(-.1*display_width, .1*display_width)
+    barrierY = random.randrange(display_height*.1, .4*display_height)
     barrier_width = 50
 
    
@@ -864,6 +867,12 @@ def gameLoop():
         
         #firepower = firepower + power_change
         fire_power += power_change
+        
+        if fire_power > 100:
+            fire_power = 100
+        elif fire_power < 1:
+            fire_power = 1
+        
         #call the function firepower which displays the power to the screen
         power(fire_power)
 
