@@ -420,27 +420,26 @@ def game_controls():
             
         #fill the screen with a white background
         gameDisplay.fill(white)
+        #define a variable that holds the current mouse position x,y as a tuple
+        mCursor = pygame.mouse.get_pos()
         
         #create messages to screen showing what the controls are
         #the third argument is y axis variance
         message_to_screen("Controls", blue, -160, "medium")
-        message_to_screen("Fire: spacebar", dgrey, -100, "small")
-        message_to_screen("Move turret: up and down arrows", dgrey, -60, "small")
-        message_to_screen("Move tank: left and right arrows", dgrey, -20, "small")
-        message_to_screen("Increase/decrease power: a/d", dgrey, 20, "small")
-        message_to_screen('Pause: press "p"', dgrey, 60, "small")
+        message_to_screen("Fire: spacebar", dgrey, -80, "small")
+        message_to_screen("Move turret: up and down arrows", dgrey, -40, "small")
+        message_to_screen("Move tank: left and right arrows", dgrey, 0, "small")
+        message_to_screen("Increase/decrease power: a/d", dgrey, 40, "small")
+        message_to_screen('Pause: press "p"', dgrey, 100, "small")
 
-        #define a variable that holds the current mouse position x,y as a tuple
-        mCursor = pygame.mouse.get_pos()
-        
         #call text_to_button function to draw text onto the buttons:
-        button("Play", 150, 400, 150, 50, dgrey, ld_grey, action = "Play")
-        button("Menu", 350, 400, 150, 50, green, l_green, action = "Menu")
-        button("Quit", 550, 400, 150, 50, blue, l_blue, action = "Quit")
-
+        button("Play", 150, 475, 150, 50, dgrey, ld_grey, action = "Play")
+        button("Menu", 350, 475, 150, 50, green, l_green, action = "Menu")
+        button("Quit", 550, 475, 150, 50, blue, l_blue, action = "Quit")
+       
         #update and iterate clock tick at 15 fps
         pygame.display.update()
-        clock.tick(30)
+        clock.tick(35)
 
 
 #define button function
@@ -449,31 +448,33 @@ def button (text, x, y, width, height, inactive_color, active_color, action = No
     mCursor = pygame.mouse.get_pos()
     #gets when the mouse button is pressed as a tuple where [0] is not pressed and [1] is pressed
     mClick = pygame.mouse.get_pressed()
+   
     #basically if the mouse cursor is within the button x and y boundries:
     if x + width > mCursor[0] > x and y + height > mCursor[1] > y:
         #draw the button with active color:
         pygame.draw.rect(gameDisplay, active_color, (x, y, width, height))
         #if mouse clicks on the X at the top right then quit:
-        if mClick[0] == 1 and action != None:
+        if mClick[0] == 1: 
             if action == "Quit":
                 pygame.quit()
                 quit()
             #if mouse clicks on controls button go to controls menu
             if action == "Controls":
                 game_controls()
+                intro = False
             #go to game loop and play the game screen
             if action == "Play":
                 gameLoop()
             #go to the menu screen when menu button is clicked
             if action == "Menu":
                 gameIntro()
+                gameControls = False
     else:
         #if mouse is not over any button display the button with inactive color
         pygame.draw.rect(gameDisplay, inactive_color, (x, y, width, height))
     #draw the text onto the buttons
     text_to_button(text,black,x,y,width,height,)
-
-
+   
 #create text object function that takes in message and color:    
 def text_objects(msg, color, size):
     #If the argument input size = "tiny"
@@ -568,6 +569,8 @@ def healthBars(playerHealth, enemyHealth):
 #define game intro screen function:
 def gameIntro():
     intro = True
+    #define a variable that holds the current mouse position x,y as a tuple
+    mCursor = pygame.mouse.get_pos()
     
     #while loop that controls events that happen in the game intro screen
     while intro:
@@ -587,6 +590,7 @@ def gameIntro():
                     #intro = false exits the game intro loop because the while loop 
                     #is dependent on intro being true
                     intro = False
+        
         #fill the screen with a white background
         gameDisplay.fill(white)
         message_to_screen("Welcome to Battle Tanks!", blue, -160, "medium")
@@ -595,9 +599,6 @@ def gameIntro():
         message_to_screen("The more enemies you kill the harder they get.", dgrey, 0, "small")
        # message_to_screen("Press 'C' to play, 'P' to pause, or 'Q' to quit.", green, 60, "small")
         message_to_screen("Created by Timothy Stanislav; Indoorkin Productions", dgrey, 225, "tiny")
-
-        #define a variable that holds the current mouse position x,y as a tuple
-        mCursor = pygame.mouse.get_pos()
         
         #call text_to_button function to draw text onto the buttons:
         button("Play", 150, 400, 150, 50, dgrey, ld_grey, action = "Play")
@@ -606,14 +607,13 @@ def gameIntro():
 
         #update and iterate clock tick 30 times
         pygame.display.update()
-        clock.tick(30)
+        clock.tick(35)
 
         
 #Create the primary game loop
 #This loop runs while the game is being played
 #It creates the background, the screen objects and 
 #iterates the code over and over like a flip book animation
-
 #function that controls what happens while gameover screen is active:
 def gameOverScreen():
     game_over_screen = True
@@ -702,7 +702,6 @@ def gameLoop():
     barrierY = random.randrange(display_height*.1, .4*display_height)
     barrier_width = 50
 
-   
     while not gameExit:
         
         if gameOver == True:
@@ -712,6 +711,7 @@ def gameLoop():
             green, y_displace = -80, size = "small") 
             #update the game:
             pygame.display.update()
+        
         #while game over:
         while gameOver == True:
             #get the event keydown from pygame module
@@ -800,8 +800,11 @@ def gameLoop():
                     damage = eFireShell(enemy_gun, enemyTankX, enemyTankY, 8, 50, barrierX, barrierY, barrier_width, mainTankX, mainTankY)
                     #subtract damage from playerHealth 
                     playerHealth -= damage
+                
+                #if key a is pressed reduce power by one
                 elif event.key == pygame.K_a:
                     power_change = -1
+                #if key d is pressed increase power by one
                 elif event.key == pygame.K_d:
                     power_change = 1
 
@@ -841,13 +844,11 @@ def gameLoop():
         elif currentTurretPos < 0:
             currentTurretPos = 0
 
-
         #logic for what happens when tank crashes into the barrier:
         if mainTankX - (tankWidth/2) < barrierX + barrier_width:
             mainTankX += 5
         
-        
-        #calls our gameDisplay variable and pygame's fill function
+        #calls the gameDisplay variable and pygame's fill function
         #will fill the entire display white
         gameDisplay.fill(white)
 
@@ -867,7 +868,7 @@ def gameLoop():
         
         #firepower = firepower + power_change
         fire_power += power_change
-        
+        #restricts fire power meter to between 1 and 100
         if fire_power > 100:
             fire_power = 100
         elif fire_power < 1:
