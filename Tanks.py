@@ -2,7 +2,7 @@ import pygame
 import time
 import random
 
-#this is a test of pygame
+
 
 #initialize the pygame modules
 #there are six so check init should return the initialized modules
@@ -69,7 +69,7 @@ clock = pygame.time.Clock()
 #head position variables:
 
 #frames per second variable:
-fps = 15
+fps = 20
 
 #create screen message function:
 def message_to_screen(msg, color, y_displace = 0, size = "small"):
@@ -140,11 +140,11 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
                 pygame.quit()
                 quit()
         #draw a green circle to the screen with a center at xy positions startingShell[0] and [1] and make it 5 pixels wide
-        pygame.draw.circle(gameDisplay, l_green, (startingShell[0], startingShell[1]), 3)
+        pygame.draw.circle(gameDisplay, l_green, (int(startingShell[0]), startingShell[1]), 3)
         
         #if statement that controls whether friendly tank is going to fire a shell
         #start the beginning shell x position at startingShell[0] and move it left across the screen
-        startingShell[0] -= (12 - currentTurretPos)*2 
+        startingShell[0] -= (12 - currentTurretPos)*0.9 
         
         #add the below calculation to the startingShell[1] position each iteration of the loop
         #this controls the behavior of the shell's y trajectory
@@ -210,7 +210,7 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
             fire = False    
             
         pygame.display.update()
-        clock.tick(30)
+        clock.tick(50)
     return damage
 
 #create enemy fire shell function.  Same as regular fireshell with minor changes:
@@ -246,7 +246,7 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
                        
             #if statement that controls whether enemy tank is going to fire a shell
             #start the beginning shell x position at startingShell[0] and move it right across the screen
-            startingShell[0] += (12 - currentTurretPos)*2 
+            startingShell[0] += (12 - currentTurretPos)*0.9 
             #main shell Y arc algorithm:
             startingShell[1] += int((((startingShell[0] -xy[0])*0.015/(currentPower/50))**2) - (currentTurretPos + currentTurretPos / (12 - currentTurretPos)))
             
@@ -284,13 +284,13 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-        print(startingShell[0], startingShell[1])
+        
         #here the shell is drawn
-        pygame.draw.circle(gameDisplay, l_blue, (startingShell[0], startingShell[1]), 3)
+        pygame.draw.circle(gameDisplay, l_blue, (int(startingShell[0]), startingShell[1]), 3)
         
         
 
-        startingShell[0] += (12 - currentTurretPos)*2 
+        startingShell[0] += (12 - currentTurretPos)*0.9
         startingShell[1] += int((((startingShell[0] -xy[0])*0.015/(randomPower/50))**2) - (currentTurretPos + currentTurretPos / (12 - currentTurretPos)))
         
         if startingShell[1] > display_height - ground_height:
@@ -333,7 +333,7 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
             fire = False    
             
         pygame.display.update()
-        clock.tick(30)
+        clock.tick(50)
     #return the current value of damage variable when called
     return damage
 
@@ -372,7 +372,7 @@ def enemy_tank(x, y, turretPos):
     #when the tank() function is called the index position is passed in and the  possible turret
         #position at that inded position will be selected.
     #This is important because it is responsible for drawing the turret at different angles
-    pygame.draw.line(gameDisplay, blue, (x-6,y+12), possibleTurrets[turretPos], enemyTurretWidth)
+    pygame.draw.line(gameDisplay, lgrey, (x-6,y+12), possibleTurrets[turretPos], enemyTurretWidth)
     
     
     #create variable for starting x position to be used to align first wheel
@@ -456,9 +456,9 @@ def game_controls():
         message_to_screen('Pause: press "p"', black, 100, "small")
 
         #call text_to_button function to draw text onto the buttons:
-        button("Play", 150, 475, 150, 50, black, ld_grey, action = "Play")
-        button("Menu", 350, 475, 150, 50, black, l_green, action = "Menu")
-        button("Quit", 550, 475, 150, 50, black, l_blue, action = "Quit")
+        button("Play", display_width * 0.3 - 150, 475, 150, 50, black, ld_grey, action = "Play")
+        button("Menu", display_width * 0.6 - 150, 475, 150, 50, black, l_green, action = "Menu")
+        button("Quit", display_width * 0.9 - 150, 475, 150, 50, black, l_blue, action = "Quit")
        
         #update and iterate clock tick at 15 fps
         pygame.display.update()
@@ -566,7 +566,7 @@ def score(score):
 #function that displays text showing the power of the shot as a percent to the screen
 def power(fire_power):
     text = smallFont.render("Power: " +str(fire_power) + "%", True, lgrey)
-    gameDisplay.blit(text, [display_width/2, 0])
+    gameDisplay.blit(text, [display_width/2 - display_width/12  , 0])
 
 #function for the enemy and player health bars
 def healthBars(playerHealth, enemyHealth):
@@ -624,9 +624,9 @@ def gameIntro():
         message_to_screen("Created by Timothy Stanislav; Indoorkin Productions", black, 225, "tiny")
         
         #call text_to_button function to draw text onto the buttons:
-        button("Play", 150, 400, 150, 50, black, ld_grey, action = "Play")
-        button("Controls", 350, 400, 150, 50, black, l_green, action = "Controls")
-        button("Quit", 550, 400, 150, 50, black, l_blue, action = "Quit")
+        button("Play", display_width * 0.3 - 150, 400, 150, 50, black, ld_grey, action = "Play")
+        button("Controls", display_width * 0.6 - 150, 400, 150, 50, black, l_green, action = "Controls")
+        button("Quit", display_width * 0.9 - 150, 400, 150, 50, black, l_blue, action = "Quit")
 
         #update and iterate clock tick 30 times
         pygame.display.update()
@@ -655,9 +655,9 @@ def gameOverScreen():
         #define a variable that holds the current mouse position x,y as a tuple
         mCursor = pygame.mouse.get_pos()
         
-        button("Play Again", 150, 400, 150, 50, black, ld_grey, action = "Play")
-        button("Controls", 350, 400, 150, 50, black, l_green, action = "Controls")
-        button("Quit", 550, 400, 150, 50, black, l_blue, action = "Quit")
+        button("Play Again", display_width * 0.3 - 150, 400, 150, 50, black, ld_grey, action = "Play")
+        button("Controls", display_width * 0.6 - 150, 400, 150, 50, black, l_green, action = "Controls")
+        button("Quit", display_width * 0.9 - 150, 400, 150, 50, black, l_blue, action = "Quit")
 
         pygame.display.update()
         clock.tick(30)
@@ -676,15 +676,15 @@ def winScreen():
                 quit()
            
         gameDisplay.fill(dgrey)
-        message_to_screen("You Win!", blue, -160, "medium")
-        message_to_screen("Your enemy is vanquished.", black, -80, "small")
+        message_to_screen("You Win!", blue, -120, "large")
+        message_to_screen("Your enemy is vanquished.", black, -20, "medium")
 
         #define a variable that holds the current mouse position x,y as a tuple
         mCursor = pygame.mouse.get_pos()
         
-        button("Play Again", 150, 400, 150, 50, black, ld_grey, action = "Play")
-        button("Controls", 350, 400, 150, 50, black, l_green, action = "Controls")
-        button("Quit", 550, 400, 150, 50, black, l_blue, action = "Quit")
+        button("Play Again", display_width * 0.3 - 150, 400, 150, 50, black, ld_grey, action = "Play")
+        button("Controls", display_width * 0.6 - 150, 400, 150, 50, black, l_green, action = "Controls")
+        button("Quit", display_width * 0.9 - 150, 400, 150, 50, black, l_blue, action = "Quit")
 
         pygame.display.update()
         clock.tick(30)
@@ -722,7 +722,7 @@ def gameLoop():
     #create main barrier variables:
     #generate barrier starting from the middle and randomly between + or - 20 percent of the display width
     barrierX = (display_width / 2) + random.randint(-.1*display_width, .1*display_width)
-    barrierY = random.randrange(display_height*.1, .4*display_height)
+    barrierY = random.randrange(display_height*.1, .5*display_height)
     barrier_width = 10
 
     while not gameExit:
@@ -793,80 +793,55 @@ def gameLoop():
                     
                     #enemy tank movement variables:
                     ePossibleMovement = ["f", "r"]
+                    #emoveIndex will always be 0,1 or 2 in this case f, neutral,reverse
                     eMoveIndex = random.randrange(0,2)
+                    #randrange will cycle through the positions in the possibleMovement list
                     #for x in range from 0 to 10
                     for x in range(random.randrange(0,10)):
                         #if enemytankX position is between 30 percent of the display width and > 3 percent of the display width
                         if display_width * 0.5 > enemyTankX > display_width * 0.03:
-                            #emoveIndex will always be 0,1 or 2 in this case f, neutral,reverse
-                            #randrange will cycle through the positions in the possibleMovement list
                             
-                            #if enemy tank runs into the barrierx position
-                            #if barrierX == enemyTankX + tankWidth:
-                                #if ePossibleMovement[eMoveIndex] == "f":
-                                    ##move back 15 pixels
-                                    #enemyTankX -= 20
-                            #logic for what happens when enemy tank crashes into the barrier:
-                            if enemyTankX + (tankWidth/2) > barrierX + barrier_width:
-                                enemyTankX -= 30
+                            if enemyTankX + tankWidth >= barrierX:
+                                print("enemy hit barrier, reversing...")
+                                enemyTankX -= 10
                                 
                             #if ePossibleMovement is position 1    
                             elif ePossibleMovement[eMoveIndex] == "f":
+                                #logic for what happens when enemy tank crashes into the barrier:
                                 #move enemytank forward 5 pixels
-                                enemyTankX += 15
+                                enemyTankX += 10
                             
                             #if ePossibleMovement is position 2
                             elif ePossibleMovement[eMoveIndex] == "r":
-                                #move back 5 pixels
-                                enemyTankX -= 15
+                                enemyTankX -= 10
                             
-                            #draw enemy tank, healthbars,barrier,ground,etc to the screen: this exact code is done below with comments
-                            gameDisplay.fill(lgrey)
-                            gameDisplay.blit(bgImage, [0, 0])
-                            healthBars(playerHealth, enemyHealth)
-                            gun = tank(mainTankX, mainTankY, currentTurretPos)
-                            enemy_gun = enemy_tank(enemyTankX, enemyTankY, 8) 
-                            fire_power += power_change
-                            power(fire_power)
-                            barrier(barrierX, barrierY, barrier_width)
-                            gameDisplay.fill(dgrey, rect = [0, display_height-ground_height, display_width, ground_height])
-                            pygame.display.update()     
-                            clock.tick(fps)
-                        
+                    
                         elif enemyTankX < display_width * 0.97:
-                               
-                            enemyTankX += 20
-                            #verify that this function works
-                            
-                            
-                            gameDisplay.fill(lgrey)
-                            gameDisplay.blit(bgImage, [0, 0])
-                            healthBars(playerHealth, enemyHealth)
-                            gun = tank(mainTankX, mainTankY, currentTurretPos)
-                            enemy_gun = enemy_tank(enemyTankX, enemyTankY, 8) 
-                            fire_power += power_change
-                            power(fire_power)
-                            barrier(barrierX, barrierY, barrier_width)
-                            gameDisplay.fill(dgrey, rect = [0, display_height-ground_height, display_width, ground_height])
-                            pygame.display.update()     
-                            clock.tick(fps)
-                        
-                        else:
-                            print(enemyTankX, barrierX)
-                            enemyTank -= 20
+                            print("enemy hit edge")
+                            enemyTankX += 10
 
-                            #draw enemy tank, healthbars,barrier,ground,etc to the screen: this exact code is done below with comments
-                            gameDisplay.fill(lgrey)
-                            gameDisplay.blit(bgImage, [0, 0])
-                            healthBars(playerHealth, enemyHealth)
-                            gun = tank(mainTankX, mainTankY, currentTurretPos)
-                            enemy_gun = enemy_tank(enemyTankX, enemyTankY, 8) 
-                            fire_power += power_change
-                            power(fire_power)
-                            barrier(barrierX, barrierY, barrier_width)
-                            gameDisplay.fill(dgrey, rect = [0, display_height-ground_height, display_width, ground_height])
-                            pygame.display.update()     
-                            clock.tick(fps)
+                        else:
+                            if enemyTankX + tankWidth >= barrierX:
+                                print("enemy hit barrier, reversing...")
+                                enemyTankX -= 10
+                            
+                            else: 
+                                print("unknown enemyTankX position")
+                                enemyTank -= 10
+
+                        #draw enemy tank, healthbars,barrier,ground,etc to the screen: this exact code is done below with comments
+                        gameDisplay.fill(lgrey)
+                        
+                        gameDisplay.blit(bgImage, [0, 0])
+                        healthBars(playerHealth, enemyHealth)
+                        gun = tank(mainTankX, mainTankY, currentTurretPos)
+                        enemy_gun = enemy_tank(enemyTankX, enemyTankY, 8) 
+                        fire_power += power_change
+                        barrier(barrierX, barrierY, barrier_width)
+                        power(fire_power)
+                        gameDisplay.fill(dgrey, rect = [0, display_height-ground_height, display_width, ground_height])
+                        pygame.display.update()     
+                        clock.tick(fps)
 
                     
                     damage = eFireShell(enemy_gun, enemyTankX, enemyTankY, 8, 50, barrierX, barrierY, barrier_width, mainTankX, mainTankY)
