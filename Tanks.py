@@ -9,6 +9,7 @@ import random
 #if pygame is correctly installed and initialized:
 checkInit = pygame.init()
 print(checkInit)
+#print(pygame.font.get_fonts())
 
 #define screen width and height variables:
 display_width = 800
@@ -51,10 +52,10 @@ bgImage = pygame.image.load("c:/Tim's Files/my dream/learning/Programming/python
 ground_height = 35
 
 #define font variables:
-tinyFont = pygame.font.SysFont("comicsansms", 12)
-smallFont = pygame.font.SysFont("comicsansms", 25)
-medFont = pygame.font.SysFont("comicsansms", 50)
-largeFont = pygame.font.SysFont("comicsansms", 80)
+tinyFont = pygame.font.SysFont('caslon', 15)
+smallFont = pygame.font.SysFont("caslon", 25)
+medFont = pygame.font.SysFont("centurygothic", 75)
+largeFont = pygame.font.SysFont("centurygothic", 100)
 
 #create the game surface with resolution of 800 x 600:
 gameDisplay = pygame.display.set_mode((display_width, display_height))
@@ -448,12 +449,12 @@ def game_controls():
         
         #create messages to screen showing what the controls are
         #the third argument is y axis variance
-        message_to_screen("Controls", blue, -160, "medium")
-        message_to_screen("Fire: spacebar", black, -80, "small")
-        message_to_screen("Move turret: up and down arrows", black, -40, "small")
-        message_to_screen("Move tank: left and right arrows", black, 0, "small")
-        message_to_screen("Increase/decrease power: a/d", black, 40, "small")
-        message_to_screen('Pause: press "p"', black, 100, "small")
+        message_to_screen("Controls", blue, display_height/2 -440, "medium")
+        message_to_screen("Fire: 'Spacebar'", black, display_height/2 -340, "small")
+        message_to_screen("Move turret: 'Up and down arrows'", black, display_height/2 -300, "small")
+        message_to_screen("Move tank: 'Left and right arrows'", black, display_height/2 -260, "small")
+        message_to_screen("Increase/decrease power: 'a/d'", black, display_height/2 -220, "small")
+        message_to_screen("Pause: 'p'", black, display_height/2 -180, "small")
 
         #call text_to_button function to draw text onto the buttons:
         button("Play", display_width * 0.3 - 150, 475, 150, 50, black, ld_grey, action = "Play")
@@ -529,7 +530,7 @@ def pause():
     
     #display paused messages
     message_to_screen("Paused", blue, -100, size = "large")
-    message_to_screen("Press 'C' to continue, M for menu or 'Q' to quit", l_green, -20)
+    message_to_screen("Press 'c' to continue, 'm' for menu or 'q' to quit", l_green, -20)
     #update the game with the changes
     pygame.display.update()
     #while the paused variable = True
@@ -616,12 +617,12 @@ def gameIntro():
         
         #fill the screen with a white background
         gameDisplay.fill(dgrey)
-        message_to_screen("Welcome to Battle Tanks!", blue, -160, "medium")
-        message_to_screen("The objective of the game is to shoot and destroy", black, -80, "small")
-        message_to_screen("the enemy tanks before they destroy you.", black, -40, "small")
-        message_to_screen("The more enemies you kill the harder they get.", black, 0, "small")
+        message_to_screen("Battle Tanks", blue, display_height/2 - 440, "large")
+        message_to_screen("The objective of the game is to shoot and destroy", black,  display_height/2  - 340, "small")
+        message_to_screen("the enemy tanks before they destroy you.", black, display_height/2 -300, "small")
+        message_to_screen("The more enemies you kill the harder they get.", black, display_height/2 -260, "small")
        # message_to_screen("Press 'C' to play, 'P' to pause, or 'Q' to quit.", green, 60, "small")
-        message_to_screen("Created by Timothy Stanislav; Indoorkin Productions", black, 225, "tiny")
+        message_to_screen("Created by Timothy Stanislav: Indoorkin Productions", black, display_height/2 - 100, "tiny")
         
         #call text_to_button function to draw text onto the buttons:
         button("Play", display_width * 0.3 - 150, 400, 150, 50, black, ld_grey, action = "Play")
@@ -649,8 +650,8 @@ def gameOverScreen():
                 quit()
            
         gameDisplay.fill(dgrey)
-        message_to_screen("Game Over!", blue, -160, "medium")
-        message_to_screen("You have been destroyed.", black, -80, "small")
+        message_to_screen("Game Over!", blue, display_height/2 -440, "medium")
+        message_to_screen("You have been destroyed.", black, display_height/2 -340, "small")
 
         #define a variable that holds the current mouse position x,y as a tuple
         mCursor = pygame.mouse.get_pos()
@@ -676,8 +677,8 @@ def winScreen():
                 quit()
            
         gameDisplay.fill(dgrey)
-        message_to_screen("You Win!", blue, -120, "large")
-        message_to_screen("Your enemy is vanquished.", black, -20, "medium")
+        message_to_screen("You Win!", blue, display_height/2 - 400, "large")
+        message_to_screen("Your enemy is vanquished.", black, display_height/2 - 300, "small")
 
         #define a variable that holds the current mouse position x,y as a tuple
         mCursor = pygame.mouse.get_pos()
