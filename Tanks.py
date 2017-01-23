@@ -2,8 +2,6 @@ import pygame
 import time
 import random
 
-
-
 #initialize the pygame modules
 #there are six so check init should return the initialized modules
 #if pygame is correctly installed and initialized:
@@ -75,6 +73,23 @@ clock = pygame.time.Clock()
 #frames per second variable:
 fps = 20
 
+
+#define function that allows time delay within a loop
+def waitFor(waitTime): # waitTime in milliseconds
+    #copy all elements of the display screen and save in screenCopy variable
+    screenCopy = gameDisplay.copy()
+    waitCount = 0
+    while waitCount < waitTime:
+        #set delay time = to current screen fps
+        dt = clock.tick(fps) 
+        #add dt to the waitCount variable
+        waitCount += dt
+        pygame.event.pump() # Tells pygame to handle it's event, instead of pygame.event.get()
+        #blit the display copy to the screen
+        gameDisplay.blit(screenCopy, (0,0))
+        #update the screen
+        pygame.display.flip()
+
 #create screen message function:
 def message_to_screen(msg, color, y_displace = 0, size = "small"):
     #create two variables that are now each text_objects functions:
@@ -84,6 +99,26 @@ def message_to_screen(msg, color, y_displace = 0, size = "small"):
     #display the two text objects to the screen:
     gameDisplay.blit(textSurf, textRect)
 
+#define enemy and player crit messages:
+def eCritMessage(eCrit, mainTankX, mainTankY):
+    #render text as small font display message with the current enemy crit value included
+    text = smallFont.render("Critical Hit! " + str(eCrit) + " Damage!", True, red)
+    
+    critLoop = 0
+    while critLoop < 4:
+        #iterate through the loop 4 times
+        critLoop += 1
+        #display the text to screen above the player tank
+        gameDisplay.blit(text, [mainTankX - 90, mainTankY - 35])
+        #delay loop keeps the message on the screen a couple seconds before the loop continues
+        waitFor(500)    
+        
+
+def pCritMessage(pCrit, enemyTankX, enemyTankY):
+    #render text as small font display message with the current player crit value included
+    text = smallFont.render("Critical Hit! " + str(pCrit) + " Damage!", True, red)
+    #display the text to screen above the enemy tank
+    gameDisplay.blit(text, [enemyTankX - len(str(pCrit)), enemyTankY - 35])
 
 def explosion(hit_x, hit_y, size=50):
     #play sound for the explosion
@@ -127,11 +162,14 @@ def explosion(hit_x, hit_y, size=50):
 #(xy is the return from the tank function, and 
 #   currentTurretPos is the position within listofPossibleTurrets
 #       this list contains x,y coordinates for the x and y position of the turret)
+
+
 def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, barrierY, barrier_width, enemyTankX, enemyTankY):
     #play sound for shell firing
     pygame.mixer.Sound.play(fireSound)
     fire = True
     damage = 0
+    pCrit = 0
     #save xy into variable startingShell
         #and convert the results from xy into a list 
         #because they were in tuple format and couldn't be modified
@@ -172,6 +210,7 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
             if enemyTankX + 10 > hit_x > enemyTankX - 10:
                 print("Critical Hit!")
                 damage = 35
+                pCrit = damage
             elif enemyTankX + 15 > hit_x > enemyTankX - 15:
                 print("Hard Hit!")
                 damage = 25
@@ -186,6 +225,10 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
             #call function that creates an explosion at impact location
             explosion(hit_x, hit_y)
             #fire is false so the while loop ends
+            #if player crit = damage, display crit message to screen above enemy tank
+            if pCrit == 35:
+                pCritMessage(pCrit, enemyTankX, enemyTankY)
+            #fire is false and the loop ends    
             fire = False
         
         #create variables that check all sides of the barrier for barrier shell collisions
@@ -215,7 +258,8 @@ def fireShell(xy, mainTankX, mainTankY, currentTurretPos, fire_power, barrierX, 
             
         pygame.display.update()
         clock.tick(50)
-    return damage
+    return damage, pCrit
+    
 
 #create enemy fire shell function.  Same as regular fireshell with minor changes:
 def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrierX, barrierY, barrier_width, mainTankX, mainTankY):
@@ -223,6 +267,8 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
     pygame.mixer.Sound.play(fireSound)
     #damage is veriable that holds amount of damage from a hit
     damage = 0
+    #variable used to measure crit damage
+    eCrit = 0
     #currentPower is the current power of the enemy tank
     #one is added each iteration to test all possible powers and hone in on the currect power to hit the player tank
     currentPower = 1
@@ -315,6 +361,7 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
         #random power has been changed above based on the current enemy difficulty level.  The affects the accuracy of the shot
         startingShell[1] += int((((startingShell[0] -xy[0])*0.015/(randomPower/50))**2) - (currentTurretPos + currentTurretPos / (12 - currentTurretPos)))
         
+        #checks to see if the shell hits the ground
         if startingShell[1] > display_height - ground_height:
             print("Last shell:", startingShell[0], startingShell[1])
             hit_x = int((startingShell[0]*display_height-ground_height)/startingShell[1])
@@ -325,7 +372,8 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
             #to register the hit change damage to 25
             if mainTankX + 10 > hit_x > mainTankX - 10:
                 print("Critical Hit!")
-                damage = 25
+                damage = 35
+                eCrit = damage
             elif mainTankX + 15 > hit_x > mainTankX - 15:
                 print("Hard Hit!")
                 damage = 18
@@ -338,13 +386,20 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
 
             #call the explosion
             explosion(hit_x, hit_y)
+            
+            #if enemy crit = damage, display crit message to screen above player tank
+            if eCrit == 35:
+                eCritMessage(eCrit, mainTankX, mainTankY)
+               
+            #fire is false so the loop ends
             fire = False
-        
+
+        #check to see if the shell is within the barrier rectangle
         check_x_1 = startingShell[0] <= barrierX + barrier_width
         check_x_2 = startingShell[0] >= barrierX
         check_y_1 = startingShell[1] <= display_height
         check_y_2 = startingShell[1] >= display_height - barrierY
-
+        #if it hits the barrier create the explosion
         if check_x_1 and check_x_2 and check_y_1 and check_y_2:
             print("Last shell:", startingShell[0], startingShell[1])
             hit_x = int(startingShell[0])
@@ -355,9 +410,10 @@ def eFireShell(xy, enemyTankX, enemyTankY, currentTurretPos, fire_power, barrier
             fire = False    
             
         pygame.display.update()
+        
         clock.tick(50)
     #return the current value of damage variable when called
-    return damage
+    return damage, eCrit
 
 
 #define the enemy tank function that draws the tank elements:
@@ -585,8 +641,7 @@ def diffScreen():
     #display messages
     message_to_screen("Select your Difficulty", blue, display_height/2 - 400, size = "medium")
     message_to_screen("Press '1' for easy, '2' for medium, or '3' for hard.", black, display_height/2 - 300, size = "small")
-    message_to_screen("Press 'm' to return to menu.  Press 'q' to quit the game.", black, display_height/2 - 280, "small")
-    message_to_screen("May fortune smile on you.", black, display_height/2 - 240, "small")
+    message_to_screen("Press 'm' to return to menu.  Press 'q' to quit the game.", black, display_height/2 - 260, "small")
     #update the game with the changes
     pygame.display.update()
     #while the paused variable = True
@@ -746,7 +801,7 @@ def winScreen():
            
         gameDisplay.fill(dgrey)
         message_to_screen("You Win!", blue, display_height/2 - 400, "large")
-        message_to_screen("Your enemy is vanquished.", black, display_height/2 - 300, "small")
+        message_to_screen("Enemy tank destroyed.", black, display_height/2 - 300, "small")
 
         #define a variable that holds the current mouse position x,y as a tuple
         mCursor = pygame.mouse.get_pos()
@@ -852,13 +907,17 @@ def gameLoop():
                 #if spacebar is pressed execute fire shell function
                 elif event.key == pygame.K_SPACE:
                     
-                    #here damage calls fireshell then returns damage and sets it = to damage
-                    damage = fireShell(gun, mainTankX, mainTankY, currentTurretPos, fire_power,barrierX, barrierY, barrier_width, enemyTankX, enemyTankY)
+                    #here damage variable calls fireshell then fireshell returns damage and player crit value and sets = to damage
+                    damage, pCrit = fireShell(gun, mainTankX, mainTankY, currentTurretPos, fire_power,barrierX, barrierY, barrier_width, enemyTankX, enemyTankY)
                     #subtract damage from enemy health
                     enemyHealth -= damage
                     #enemy_gun is the same for the enemy tank,
                     #8 is the enemy current turret position, from the possibleTurret list, and 50 is the starting fire power
-                    #here damage calls eFireshell then returns damage and sets it = to damage
+                    #here damage calls eFireshell then returns damage and enemy crit value and sets it = to damage
+                    damage, eCrit = eFireShell(enemy_gun, enemyTankX, enemyTankY, 8, 50, barrierX, barrierY, barrier_width, mainTankX, mainTankY)
+                    #subtract damage from playerHealth 
+                    playerHealth -= damage
+                    
                     
                     #enemy tank movement variables:
                     ePossibleMovement = ["f", "r"]
@@ -914,10 +973,7 @@ def gameLoop():
                         clock.tick(fps)
 
                     
-                    damage = eFireShell(enemy_gun, enemyTankX, enemyTankY, 8, 50, barrierX, barrierY, barrier_width, mainTankX, mainTankY)
-                    #subtract damage from playerHealth 
-                    playerHealth -= damage
-                
+                    
                 #if key a is pressed reduce power by one
                 elif event.key == pygame.K_a:
                     power_change = -1
@@ -1022,6 +1078,7 @@ def gameLoop():
     pygame.quit()
     #quit python
     quit()
+
 
 
 
