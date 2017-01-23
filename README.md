@@ -2,7 +2,7 @@
 A simple 2d battle tank game.
 
 
-Players alternate firing at one another accross the screen.  A barrier in the middle prevents them from moving into each other.
+Players alternate firing at one another across the screen.  A barrier in the middle prevents them from moving into each other.
 There are three difficulty levels.  See if you can beat them all!
 
 To install:
