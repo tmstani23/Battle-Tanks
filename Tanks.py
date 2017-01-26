@@ -1,13 +1,19 @@
 import pygame
 import time
 import random
+import os
+import sys
 
 #initialize the pygame modules
 #there are six so check init should return the initialized modules
 #if pygame is correctly installed and initialized:
+pygame.mixer.pre_init(44100, -16, 2, 2048) # setup mixer to avoid sound lag
 checkInit = pygame.init()
 print(checkInit)
-#print(pygame.font.get_fonts())
+dir = os.path.dirname(__file__)
+#soundLoc = "../Tanks"
+print(os.getcwd())
+
 
 #define screen width and height variables:
 display_width = 800
@@ -29,8 +35,8 @@ yellow = (255, 255, 0)
 red = (255, 0, 0)
 
 #sound file variables
-fireSound = pygame.mixer.Sound("c:/Tim's Files/my dream/learning/Programming/python/Tanks/explosion4.wav")
-explosionSound = pygame.mixer.Sound("c:/Tim's Files/my dream/learning/Programming/python/Tanks/explosion1.wav")
+fireSound = pygame.mixer.Sound('explosion4.ogg')
+explosionSound = pygame.mixer.Sound('explosion1.ogg')
 
 #define variables for the tank size:
 tankWidth = 40
@@ -43,10 +49,10 @@ wheelWidth = 5
 eDifficulty = 0
 
 #image file variables:
-playerTankImage = pygame.image.load("c:/Tim's Files/my dream/learning/Programming/python/Tanks/tank1real.png")
-enemyTankImage = pygame.image.load("c:/Tim's Files/my dream/learning/Programming/python/Tanks/tank2real.png")
+playerTankImage = pygame.image.load('tank1real.png')
+enemyTankImage = pygame.image.load('tank2real.png')
 #background image
-bgImage = pygame.image.load("c:/Tim's Files/my dream/learning/Programming/python/Tanks/nightsky.jpg").convert()
+bgImage = pygame.image.load('nightsky.jpg')
 
 
 #ground variables
@@ -64,7 +70,7 @@ gameDisplay = pygame.display.set_mode((display_width, display_height))
 pygame.display.set_caption('Battle Tanks')
 
 #incorporate game icon
-icon = pygame.image.load("c:/Tim's Files/my dream/learning/Programming/python/Snake Game/gameicon.jpg")
+icon = pygame.image.load('gameicon.jpg')
 pygame.display.set_icon(icon)
 #define a clock variable that tracks time in the game loop
 clock = pygame.time.Clock()
