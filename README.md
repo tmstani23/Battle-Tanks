@@ -10,3 +10,9 @@ Download Battle Tanks-0.0.0-win32.msi from the repo and install it on a windows 
 
 Alternatively, if you have the current version of python you can just download clone the repo.
 Make sure you have the current version of the pygame module installed.
+
+Screenshots:
+![](https://github.com/tmstani23/Battle-Tanks/blob/Working/screenshot1.jpg)
+![](https://github.com/tmstani23/Battle-Tanks/blob/Working/screenshot2.jpg)
+![](https://github.com/tmstani23/Battle-Tanks/blob/Working/screenshot3.jpg)
+
